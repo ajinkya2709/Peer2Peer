@@ -1,0 +1,7 @@
+import java.io.Serializable;
+
+public interface PeerMessage extends Serializable{
+	public int getType();	
+	public int getMessageLength();
+	public int getMessageNumber();
+}
