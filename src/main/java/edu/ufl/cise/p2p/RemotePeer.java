@@ -1,4 +1,4 @@
-package edu.ufl.cise.p2p.reader;
+package edu.ufl.cise.p2p;
 
 /**
  * Created by aditya on 2/18/17.
