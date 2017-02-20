@@ -4,17 +4,17 @@ package edu.ufl.cise.p2p;
  * Created by Aditya on 2/18/17.
  */
 public class RemotePeer {
-    private String ipAddress;
-    private Integer port;
-    private String peerId;
-    private Boolean hasFile;
+	private String ipAddress;
+	private int port;
+	private String peerId;
+	private Boolean hasFile;
 
-    public RemotePeer(String ipAddress, Integer port, String peerId, Boolean hasFile){
-        this.ipAddress = ipAddress;
-        this.port = port;
-        this.peerId = peerId;
-        this.hasFile = hasFile;
-    }
+	public RemotePeer(String ipAddress, int port, String peerId, Boolean hasFile) {
+		this.ipAddress = ipAddress;
+		this.port = port;
+		this.peerId = peerId;
+		this.hasFile = hasFile;
+	}
 
 	public String getIpAddress() {
 		return ipAddress;
@@ -24,11 +24,11 @@ public class RemotePeer {
 		this.ipAddress = ipAddress;
 	}
 
-	public Integer getPort() {
+	public int getPort() {
 		return port;
 	}
 
-	public void setPort(Integer port) {
+	public void setPort(int port) {
 		this.port = port;
 	}
 
@@ -47,7 +47,5 @@ public class RemotePeer {
 	public void setHasFile(Boolean hasFile) {
 		this.hasFile = hasFile;
 	}
-    
 
-  
 }

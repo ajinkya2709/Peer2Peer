@@ -11,18 +11,26 @@ public class Peer implements Runnable {
 	private CommonPeerProperties commonProps;
 	private String id;
 	private String host;
-	private Integer port;
+	private int port;
 	private Boolean hasFile;
 
 	public Peer() {
 
 	}
 
-	public Peer(String id, String host, Integer port, Boolean hasFile) {
+	public Peer(String id, String host, int port, Boolean hasFile) {
 		this.id = id;
 		this.host = host;
 		this.port = port;
 		this.hasFile = hasFile;
+	}
+
+	public CommonPeerProperties getCommonProps() {
+		return commonProps;
+	}
+
+	public void setCommonProps(CommonPeerProperties commonProps) {
+		this.commonProps = commonProps;
 	}
 
 	public String getId() {
@@ -41,11 +49,11 @@ public class Peer implements Runnable {
 		this.host = host;
 	}
 
-	public Integer getPort() {
+	public int getPort() {
 		return port;
 	}
 
-	public void setPort(Integer port) {
+	public void setPort(int port) {
 		this.port = port;
 	}
 
@@ -57,14 +65,6 @@ public class Peer implements Runnable {
 		this.hasFile = hasFile;
 	}
 
-	public CommonPeerProperties getCommonProps() {
-		return commonProps;
-	}
-
-	public void setCommonProps(CommonPeerProperties commonProps) {
-		this.commonProps = commonProps;
-	}
-
 	public void run() {
 		boolean shouldRun = true;
 		ServerSocket serverSocket = null;
@@ -72,7 +72,7 @@ public class Peer implements Runnable {
 			try {
 				serverSocket = new ServerSocket(port);
 				createNewConnection(serverSocket.accept());
-				
+
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -85,17 +85,19 @@ public class Peer implements Runnable {
 
 	}
 
-
-	private void createNewConnection(Socket socket){
+	private void createNewConnection(Socket socket) {
 		new Thread(new PeerConnection(Integer.parseInt(id), -1)).start();
 	}
-	
+
 	public void connectToRemotePeers(List<RemotePeer> remotePeers) {
 		for (RemotePeer remotePeer : remotePeers) {
 			try {
+				System.out.println("Connecting to peer:"
+						+ remotePeer.getIpAddress() + " at:"
+						+ remotePeer.getPort());
 				Socket socket = new Socket(remotePeer.getIpAddress(),
 						remotePeer.getPort());
-				
+
 			} catch (UnknownHostException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
