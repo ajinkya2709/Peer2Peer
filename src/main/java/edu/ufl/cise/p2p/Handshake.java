@@ -1,3 +1,4 @@
+package edu.ufl.cise.p2p;
 public class Handshake implements PeerMessage
 {
 	private String handShakeHeader;

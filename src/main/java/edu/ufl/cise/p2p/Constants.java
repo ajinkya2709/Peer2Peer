@@ -1,3 +1,4 @@
+package edu.ufl.cise.p2p;
 public class Constants {
 	
 	/** The Constant MAX_MESSAGE_SIZE. */

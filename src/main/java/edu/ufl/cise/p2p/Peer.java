@@ -68,14 +68,13 @@ public class Peer implements Runnable {
 	public void run() {
 		boolean shouldRun = true;
 		ServerSocket serverSocket = null;
+		try {
+		serverSocket = new ServerSocket(port);
 		while (shouldRun) {
-			try {
-				serverSocket = new ServerSocket(port);
-				createNewConnection(serverSocket.accept());
-
-			} catch (IOException e) {
-				e.printStackTrace();
+			createNewConnection(serverSocket.accept());
 			}
+		}catch (IOException e) {
+			e.printStackTrace();
 		}
 		try {
 			serverSocket.close();
