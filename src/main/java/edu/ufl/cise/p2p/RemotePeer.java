@@ -52,4 +52,20 @@ public class RemotePeer {
 		this.hasFile = hasFile;
 	}
 
+	public PeerConnection getConnection() {
+		return connection;
+	}
+
+	public void setConnection(PeerConnection connection) {
+		this.connection = connection;
+	}
+
+	public AtomicBoolean getIsInterested() {
+		return isInterested;
+	}
+
+	public void setIsInterested(AtomicBoolean isInterested) {
+		this.isInterested = isInterested;
+	}
+
 }
