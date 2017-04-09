@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Peer implements Runnable {
@@ -13,21 +14,30 @@ public class Peer implements Runnable {
 	private String host;
 	private int port;
 	private Boolean hasFile;
+	private PeerHandler peerHandler;
+	private FileHandler fileHandler;
+	List<RemotePeer> remotePeers;
 
 	public Peer() {
 
 	}
 
-	// Method to initialize Peer handler and File handler
 	public void init() {
-
+		peerHandler.sendChokeAndUnchokeMessages();
+		if (hasFile)
+			fileHandler.setAllPieces();
 	}
 
-	public Peer(String id, String host, int port, Boolean hasFile) {
+	public Peer(String id, String host, int port, Boolean hasFile,
+			List<RemotePeer> remotePeers) {
 		this.id = id;
 		this.host = host;
 		this.port = port;
 		this.hasFile = hasFile;
+		this.remotePeers = remotePeers;
+		this.peerHandler = new PeerHandler(new ArrayList<RemotePeer>(remotePeers), commonProps, hasFile);
+		this.fileHandler = new FileHandler(commonProps.getPieceSize(),
+				commonProps.getFileSize(), commonProps.getFileName());
 	}
 
 	public CommonPeerProperties getCommonProps() {
@@ -75,8 +85,11 @@ public class Peer implements Runnable {
 		ServerSocket serverSocket = null;
 		try {
 			serverSocket = new ServerSocket(port);
+			System.out.println("Server started on address:" + host + " port:"
+					+ port);
 			while (shouldRun) {
 				createNewConnection(serverSocket.accept(), id, "", false);
+
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -92,8 +105,8 @@ public class Peer implements Runnable {
 	private void createNewConnection(Socket socket, String peerId,
 			String remotePeerId, boolean isClient) {
 		try {
-			new Thread(new PeerConnection(socket, id, remotePeerId, isClient))
-					.start();
+			new Thread(new PeerConnection(socket, id, remotePeerId, isClient,
+					fileHandler)).start();
 		} catch (IOException e) {
 			System.out.println("IO Exception while creating a new Connection");
 			e.printStackTrace();
@@ -103,7 +116,7 @@ public class Peer implements Runnable {
 	public void connectToRemotePeers(List<RemotePeer> remotePeers) {
 		for (RemotePeer rPeer : remotePeers) {
 			try {
-				if (rPeer.getPeerId().compareTo(id) <= 0)
+				if (rPeer.getPeerId().compareTo(id) == 0)
 					break;
 				System.out.println("Connecting to peer:" + rPeer.getIpAddress()
 						+ " at:" + rPeer.getPort());
