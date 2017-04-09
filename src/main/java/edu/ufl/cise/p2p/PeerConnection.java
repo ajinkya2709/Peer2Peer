@@ -4,8 +4,12 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.BitSet;
 
+import edu.ufl.cise.p2p.message.Bitfield;
 import edu.ufl.cise.p2p.message.Handshake;
+import edu.ufl.cise.p2p.message.Message;
+import edu.ufl.cise.p2p.message.MessageProcessor;
 
 public class PeerConnection implements Runnable {
 
@@ -15,9 +19,10 @@ public class PeerConnection implements Runnable {
 	boolean isClient;
 	ObjectInputStream inStream;
 	ObjectOutputStream outStream;
+	FileHandler fileHandler;
 
 	public PeerConnection(Socket socket, String localPeerId, String remotePeer,
-			boolean isClient) throws IOException {
+			boolean isClient, FileHandler fileHandler) throws IOException {
 		this.socket = socket;
 		this.localPeerId = localPeerId;
 		this.remotePeerId = remotePeer;
@@ -25,21 +30,27 @@ public class PeerConnection implements Runnable {
 		this.outStream = new ObjectOutputStream(socket.getOutputStream());
 		this.outStream.flush();
 		this.inStream = new ObjectInputStream(socket.getInputStream());
+		this.fileHandler = fileHandler;
 	}
 
 	public void run() {
 		System.out.println("Connection created between :" + localPeerId
 				+ "\tand:" + remotePeerId);
 		try {
-
 			outStream.writeObject(new Handshake(Integer.parseInt(localPeerId)));
-
 			Handshake handShakeReceived = (Handshake) inStream.readObject();
 			System.out.println("Peer :[" + localPeerId
 					+ "] received Handshake from Peer :["
 					+ handShakeReceived.getPeerId() + "]");
-			//If it's a client, we can verify expected server
+			// If it's a client, we have to verify expected server
 
+			MessageProcessor processor = new MessageProcessor(fileHandler);
+			Message response = processor.createResponse(handShakeReceived);
+			sendMessage(response);
+			
+			Bitfield bitfield = (Bitfield) inStream.readObject();
+			BitSet received = bitfield.getBitSet();
+			System.out.println("Peer :"+handShakeReceived+" has bitfield of size :"+received.length());
 		} catch (NumberFormatException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -51,6 +62,12 @@ public class PeerConnection implements Runnable {
 			e.printStackTrace();
 		}
 
+	}
+
+	private void sendMessage(Message response) throws IOException {
+		if (response == null)
+			return;
+		outStream.writeObject(response);
 	}
 
 }
