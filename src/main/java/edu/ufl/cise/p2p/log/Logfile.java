@@ -15,13 +15,13 @@ import java.io.IOException;
  * Downloading a piece
  * Completion of download
  */
-public class LogFile extends Log
+public class Logfile extends Log
 {
 	/******************* Class Attributes *******************/
 	private int peerID;
 	
 	/******************* Class Methods *******************/
-	public LogFile(int peerID, String path) throws IOException 
+	public Logfile(int peerID, String path) throws IOException 
 	{
 		super(path + "log_peer_" + peerID + ".log");
 		this.peerID = peerID;
