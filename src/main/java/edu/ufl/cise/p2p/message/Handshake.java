@@ -9,9 +9,9 @@ import java.nio.ByteBuffer;
 public class Handshake implements Externalizable {
 
 	String handshakeHeader = "P2PFILESHARINGPROJ";
-	byte[] header;
-	byte[] zeroBits;
-	byte[] peerId;
+	byte[] header = new byte[18];
+	byte[] zeroBits = new byte[10];
+	byte[] peerId = new byte[4];
 
 	public Handshake() {
 
