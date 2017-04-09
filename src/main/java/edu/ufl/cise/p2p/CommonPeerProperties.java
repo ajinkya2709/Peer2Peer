@@ -7,6 +7,7 @@ public class CommonPeerProperties {
 	Integer optimisticUnchokingInterval;
 	String fileName;
 	Integer fileSize;
+	Integer pieceSize;
 
 	public CommonPeerProperties() {
 
@@ -51,6 +52,14 @@ public class CommonPeerProperties {
 
 	public void setFileSize(Integer fileSize) {
 		this.fileSize = fileSize;
+	}
+
+	public Integer getPieceSize() {
+		return pieceSize;
+	}
+
+	public void setPieceSize(Integer pieceSize) {
+		this.pieceSize = pieceSize;
 	}
 
 }
