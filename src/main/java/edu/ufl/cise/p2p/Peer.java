@@ -29,12 +29,13 @@ public class Peer implements Runnable {
 	}
 
 	public Peer(String id, String host, int port, Boolean hasFile,
-			List<RemotePeer> remotePeers) {
+			List<RemotePeer> remotePeers, CommonPeerProperties commonProps) {
 		this.id = id;
 		this.host = host;
 		this.port = port;
 		this.hasFile = hasFile;
 		this.remotePeers = remotePeers;
+		this.commonProps = commonProps;
 		this.peerHandler = new PeerHandler(new ArrayList<RemotePeer>(remotePeers), commonProps, hasFile);
 		this.fileHandler = new FileHandler(commonProps.getPieceSize(),
 				commonProps.getFileSize(), commonProps.getFileName());
