@@ -1,6 +1,9 @@
 package edu.ufl.cise.p2p;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -39,7 +42,7 @@ public class PeerHandler{
 
         ArrayList<RemotePeer> remotePeers;
         CommonPeerProperties commonProp;
-        AtomicBoolean hasFile;
+        AtomicBoolean hasFile = new AtomicBoolean(false);
         ArrayList<RemotePeer> interestedPeers;
         ArrayList<RemotePeer> prefferedNeighbours;
         OptimisticallyUnchokedNeighbour optUnchokedScheduler;
