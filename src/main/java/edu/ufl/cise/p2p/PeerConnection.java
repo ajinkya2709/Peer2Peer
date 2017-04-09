@@ -22,8 +22,10 @@ public class PeerConnection implements Runnable {
 		this.localPeerId = localPeerId;
 		this.remotePeerId = remotePeer;
 		this.isClient = isClient;
-		this.inStream = new ObjectInputStream(socket.getInputStream());
 		this.outStream = new ObjectOutputStream(socket.getOutputStream());
+		this.outStream.flush();
+		this.inStream = new ObjectInputStream(socket.getInputStream());
+		
 	}
 
 	public void run() {
