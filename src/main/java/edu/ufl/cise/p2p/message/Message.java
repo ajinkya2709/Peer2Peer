@@ -36,7 +36,7 @@ public class Message implements Externalizable {
 		type = (byte) in.read();
 		int messageLength = ByteBuffer.wrap(length).getInt();
 		payload = new byte[messageLength - 1];
-		in.read(payload, 0, messageLength);
+		in.read(payload, 0, messageLength - 1);
 	}
 
 }
