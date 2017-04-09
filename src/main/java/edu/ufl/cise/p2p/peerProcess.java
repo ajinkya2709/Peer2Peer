@@ -26,13 +26,13 @@ public class peerProcess {
 		Peer peer = null;
 		for (RemotePeer rPeer : remotePeers) {
 			if(rPeer.getPeerId().equalsIgnoreCase(peerId)){
-				peer = new Peer(rPeer.getPeerId(),rPeer.getIpAddress(),rPeer.getPort(),rPeer.getHasFile(),remotePeers);
+				peer = new Peer(rPeer.getPeerId(),rPeer.getIpAddress(),rPeer.getPort(),rPeer.getHasFile(),remotePeers, common);
 				break;
 			}
 		}
 
 		System.out.println("Read current and remote peer info");
-		peer.setCommonProps(common);
+		//peer.setCommonProps(common);
 		peer.init();
 		Thread serverThread = new Thread(peer);
 		serverThread.start();
