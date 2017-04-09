@@ -30,7 +30,6 @@ public class PeerConfigReader {
 			while ((line = br.readLine()) != null) {
 				line = line.trim();
 				tokens = line.split(delimiter);
-				if(tokens[0].compareTo(peerId) > 0) break;
 				Boolean hasFile = (tokens[3].trim().compareTo("1") == 0);
 				peerInfoList.add(new RemotePeer(tokens[1], Integer
 						.parseInt(tokens[2]), tokens[0], hasFile));
