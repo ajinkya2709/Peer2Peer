@@ -9,12 +9,14 @@ import java.nio.ByteBuffer;
 public class Handshake implements Externalizable {
 
 	String handshakeHeader = "P2PFILESHARINGPROJ";
-	byte[] header = new byte[18];
-	byte[] zeroBits = new byte[10];
-	byte[] peerId = new byte[4];
+	byte[] header;
+	byte[] zeroBits;
+	byte[] peerId;
 
 	public Handshake() {
-
+		header = new byte[18];
+		zeroBits = new byte[10];
+		peerId = new byte[4];
 	}
 
 	public Handshake(int peerId) {
@@ -29,7 +31,8 @@ public class Handshake implements Externalizable {
 	}
 
 	public void writeExternal(ObjectOutput out) throws IOException {
-		System.out.println("writeExternal triggered. Sending handshake to outstream");
+		System.out
+				.println("writeExternal triggered. Sending handshake to outstream");
 		out.write(header, 0, header.length);
 		out.write(zeroBits, 0, zeroBits.length);
 		out.write(peerId, 0, peerId.length);
@@ -37,7 +40,8 @@ public class Handshake implements Externalizable {
 
 	public void readExternal(ObjectInput in) throws IOException,
 			ClassNotFoundException {
-		System.out.println("readExternal triggered. Reading handshake object from instream");
+		System.out
+				.println("readExternal triggered. Reading handshake object from instream");
 		in.read(header, 0, header.length);
 		in.read(zeroBits, 0, zeroBits.length);
 		in.read(peerId, 0, peerId.length);
