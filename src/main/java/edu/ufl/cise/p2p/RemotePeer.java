@@ -1,6 +1,7 @@
 package edu.ufl.cise.p2p;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by Aditya on 2/18/17.
@@ -12,6 +13,7 @@ public class RemotePeer {
 	private Boolean hasFile;
 	private PeerConnection connection;
 	private AtomicBoolean isInterested;
+	private AtomicInteger bytesDownloaded;
 
 	public RemotePeer(String ipAddress, int port, String peerId, Boolean hasFile) {
 		this.ipAddress = ipAddress;
@@ -66,6 +68,14 @@ public class RemotePeer {
 
 	public void setIsInterested(AtomicBoolean isInterested) {
 		this.isInterested = isInterested;
+	}
+
+	public AtomicInteger getBytesDownloaded() {
+		return bytesDownloaded;
+	}
+
+	public void setBytesDownloaded(AtomicInteger bytesDownloaded) {
+		this.bytesDownloaded = bytesDownloaded;
 	}
 
 }
