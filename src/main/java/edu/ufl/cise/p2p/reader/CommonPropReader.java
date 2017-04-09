@@ -13,7 +13,7 @@ public class CommonPropReader {
 
 	private final static String fileName = "/Common.cfg";
 	private final static String delimiter = "\\s+";
-	
+
 	public CommonPropReader() {
 	}
 
@@ -66,6 +66,8 @@ public class CommonPropReader {
 				.valueOf(prop.get("UnchokingInterval"))));
 		common.setUnchokingInterval(Integer.parseInt(String.valueOf(prop
 				.get("OptimisticUnchokingInterval"))));
+		common.setPieceSize(Integer.parseInt(String.valueOf(prop
+				.get("PieceSize"))));
 		return common;
 	}
 
