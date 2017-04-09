@@ -18,6 +18,11 @@ public class Peer implements Runnable {
 
 	}
 
+	// Method to initialize Peer handler and File handler
+	public void init() {
+
+	}
+
 	public Peer(String id, String host, int port, Boolean hasFile) {
 		this.id = id;
 		this.host = host;
@@ -69,11 +74,11 @@ public class Peer implements Runnable {
 		boolean shouldRun = true;
 		ServerSocket serverSocket = null;
 		try {
-		serverSocket = new ServerSocket(port);
-		while (shouldRun) {
-			createNewConnection(serverSocket.accept());
+			serverSocket = new ServerSocket(port);
+			while (shouldRun) {
+				createNewConnection(serverSocket.accept(), id, "", false);
 			}
-		}catch (IOException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		try {
@@ -84,18 +89,27 @@ public class Peer implements Runnable {
 
 	}
 
-	private void createNewConnection(Socket socket) {
-		new Thread(new PeerConnection(Integer.parseInt(id), -1)).start();
+	private void createNewConnection(Socket socket, String peerId,
+			String remotePeerId, boolean isClient) {
+		try {
+			new Thread(new PeerConnection(socket, id, remotePeerId, isClient))
+					.start();
+		} catch (IOException e) {
+			System.out.println("IO Exception while creating a new Connection");
+			e.printStackTrace();
+		}
 	}
 
 	public void connectToRemotePeers(List<RemotePeer> remotePeers) {
-		for (RemotePeer remotePeer : remotePeers) {
+		for (RemotePeer rPeer : remotePeers) {
 			try {
-				System.out.println("Connecting to peer:"
-						+ remotePeer.getIpAddress() + " at:"
-						+ remotePeer.getPort());
-				Socket socket = new Socket(remotePeer.getIpAddress(),
-						remotePeer.getPort());
+				if (rPeer.getPeerId().compareTo(id) <= 0)
+					break;
+				System.out.println("Connecting to peer:" + rPeer.getIpAddress()
+						+ " at:" + rPeer.getPort());
+				Socket socket = new Socket(rPeer.getIpAddress(),
+						rPeer.getPort());
+				createNewConnection(socket, id, rPeer.getPeerId(), true);
 
 			} catch (UnknownHostException e) {
 				// TODO Auto-generated catch block
