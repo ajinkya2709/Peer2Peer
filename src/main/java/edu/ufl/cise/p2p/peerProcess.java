@@ -22,23 +22,18 @@ public class peerProcess {
 		System.out.println("Read common properties");
 		List<RemotePeer> remotePeers = PeerConfigReader.getPeerInfoList(peerId);
 
-		for (RemotePeer peer : remotePeers) {
-			System.out.print(peer.getPeerId() + "\t");
-			System.out.print(peer.getIpAddress() + "\t");
-			System.out.print(peer.getPort() + "\t");
-			System.out.print(peer.getHasFile());
-			System.out.println();
+		Peer peer = null;
+		for (RemotePeer rPeer : remotePeers) {
+			if(rPeer.getPeerId().equalsIgnoreCase(peerId)){
+				peer = new Peer(rPeer.getPeerId(),rPeer.getIpAddress(),rPeer.getPort(),rPeer.getHasFile());
+				break;
+			}
 		}
 
 		System.out.println("Read current and remote peer info");
-		RemotePeer current = remotePeers.get(remotePeers.size() - 1);
-		remotePeers.remove(remotePeers.size() - 1);
-		Peer peer = new Peer(current.getPeerId(), current.getIpAddress(),
-				current.getPort(), current.getHasFile());
 		peer.setCommonProps(common);
 		Thread serverThread = new Thread(peer);
 		serverThread.start();
-		
 		peer.connectToRemotePeers(remotePeers);
 
 	}
