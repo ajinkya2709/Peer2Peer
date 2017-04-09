@@ -18,6 +18,7 @@ public class peerProcess {
 		System.out.println(common.getNumberOfPreferredNeighbors());
 		System.out.println(common.getUnchokingInterval());
 		System.out.println(common.getOptimisticUnchokingInterval());
+		System.out.println(common.getPieceSize());
 
 		System.out.println("Read common properties");
 		List<RemotePeer> remotePeers = PeerConfigReader.getPeerInfoList(peerId);
