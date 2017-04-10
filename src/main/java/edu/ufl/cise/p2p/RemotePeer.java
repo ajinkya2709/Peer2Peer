@@ -1,5 +1,6 @@
 package edu.ufl.cise.p2p;
 
+import java.util.BitSet;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -14,6 +15,7 @@ public class RemotePeer {
 	private PeerConnection connection;
 	private AtomicBoolean isInterested;
 	private AtomicInteger bytesDownloaded;
+	private BitSet bitSet;
 
 	public RemotePeer(String ipAddress, int port, String peerId, Boolean hasFile) {
 		this.ipAddress = ipAddress;
@@ -76,6 +78,14 @@ public class RemotePeer {
 
 	public void setBytesDownloaded(AtomicInteger bytesDownloaded) {
 		this.bytesDownloaded = bytesDownloaded;
+	}
+
+	public BitSet getBitSet() {
+		return bitSet;
+	}
+
+	public void setBitSet(BitSet bitSet) {
+		this.bitSet = bitSet;
 	}
 
 }
