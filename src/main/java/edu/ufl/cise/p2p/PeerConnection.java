@@ -56,6 +56,7 @@ public class PeerConnection implements Runnable {
 			Message response = processor.createResponse(handShakeReceived);
 			sendMessage(response);
 
+			//Code to test Bitfield.
 			Bitfield bitfield = (Bitfield) inStream.readObject();
 			BitSet received = bitfield.getBitSet();
 			System.out.println("Peer :" + handShakeReceived
@@ -63,7 +64,7 @@ public class PeerConnection implements Runnable {
 
 			while (true) {
 				Message message = (Message) inStream.readObject();
-				response = processor.createResponse(message);
+				response = processor.createResponse(message, remotePeerMap.get(remotePeerId));
 				sendMessage(response);
 			}
 
