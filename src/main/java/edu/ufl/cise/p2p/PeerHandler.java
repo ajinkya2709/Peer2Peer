@@ -4,10 +4,7 @@ import edu.ufl.cise.p2p.message.Choke;
 import edu.ufl.cise.p2p.message.Unchoke;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedList;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -48,9 +45,9 @@ public class PeerHandler{
         CommonPeerProperties commonProp;
         AtomicBoolean hasFile = new AtomicBoolean(false);
         ArrayList<RemotePeer> interestedPeers;
-        ArrayList<RemotePeer> prefferedNeighbours;
+        ArrayList<RemotePeer> preferredNeighbours;
         OptimisticallyUnchokedNeighbour optUnchokedScheduler;
-        RemotePeer optUnchokedNeighbour;
+        ArrayList<RemotePeer> optUnchokedNeighbours;
 
         public PreferredNeighbours(ArrayList<RemotePeer> peers, CommonPeerProperties prop,
                                    Boolean hasFile, OptimisticallyUnchokedNeighbour optUnchokedScheduler){
@@ -58,7 +55,8 @@ public class PeerHandler{
             commonProp = prop;
             this.hasFile.set(hasFile);
             this.optUnchokedScheduler = optUnchokedScheduler;
-            prefferedNeighbours = new ArrayList<RemotePeer>();
+            preferredNeighbours = new ArrayList<RemotePeer>();
+            optUnchokedNeighbours = new ArrayList<RemotePeer>();
         }
 
         public void run(){
@@ -80,21 +78,17 @@ public class PeerHandler{
                 for(RemotePeer i : remotePeers)
                     i.getBytesDownloaded().set(0);
 
-                prefferedNeighbours.clear();
-                prefferedNeighbours.addAll(interestedPeers.subList(0,
+                clearPreviousPreferredNeighbours();
+                preferredNeighbours.addAll(interestedPeers.subList(0,
                         Math.min(commonProp.getNumberOfPreferredNeighbors(),interestedPeers.size())));
 
                 LinkedList<RemotePeer> chokedPeers = new LinkedList<RemotePeer>(remotePeers);
-                chokedPeers.removeAll(prefferedNeighbours);
+                chokedPeers.removeAll(preferredNeighbours);
 
-                if(interestedPeers.size() <= prefferedNeighbours.size())
-                    optUnchokedNeighbour = null;
-                else
-                    optUnchokedNeighbour = interestedPeers.get(prefferedNeighbours.size());
+                optUnchokedNeighbours.clear();
+                optUnchokedNeighbours.addAll(interestedPeers.subList(preferredNeighbours.size(),interestedPeers.size()));
 
-                optUnchokedScheduler.unchokeablePeersLock.lock();
-                optUnchokedScheduler.updateOptUnchokeablePeers(optUnchokedNeighbour);
-                optUnchokedScheduler.unchokeablePeersLock.unlock();
+                optUnchokedScheduler.updateOptUnchokeablePeers(optUnchokedNeighbours);
 
                 for(RemotePeer chokedPeer: chokedPeers){
 
@@ -111,7 +105,7 @@ public class PeerHandler{
 
                 }
 
-                for(RemotePeer preferredNeighbour: prefferedNeighbours){
+                for(RemotePeer preferredNeighbour: preferredNeighbours){
 
                     try {
                         if(!preferredNeighbour.getIsUnchoked().get()){
@@ -137,35 +131,58 @@ public class PeerHandler{
             }
             return temp;
         }
+
+        private void clearPreviousPreferredNeighbours(){
+            for(RemotePeer i : preferredNeighbours)
+                i.getIsPreferredNeighbor().set(false);
+
+            preferredNeighbours.clear();
+        }
     }
 
     class OptimisticallyUnchokedNeighbour implements Runnable{
 
-        RemotePeer optUnchokeablePeer;
+        ArrayList<RemotePeer> optUnchokeablePeers;
         CommonPeerProperties commonProp;
+        RemotePeer optimisticallyUnchokedNeighbour;
         public final ReentrantLock unchokeablePeersLock;
 
         public OptimisticallyUnchokedNeighbour(CommonPeerProperties prop){
             commonProp = prop;
-            optUnchokeablePeer = null;
             unchokeablePeersLock = new ReentrantLock();
         }
         public void run(){
             unchokeablePeersLock.lock();
-            if(optUnchokeablePeer != null) {
-                try {
-                    optUnchokeablePeer.getConnection().sendMessage(new Unchoke());
-                } catch (IOException e) {
-                    e.printStackTrace();
+
+            if(optUnchokeablePeers.size() != 0){
+                Random rand = new Random();
+                if(optimisticallyUnchokedNeighbour != null)
+                    optimisticallyUnchokedNeighbour.getIsOptimisticallyUnchoked().set(false);
+
+                optimisticallyUnchokedNeighbour = optUnchokeablePeers.get(rand.nextInt(optUnchokeablePeers.size()));
+
+
+                if(!optimisticallyUnchokedNeighbour.getIsUnchoked().get()){
+
+                    try {
+                        optimisticallyUnchokedNeighbour.getConnection().sendMessage(new Unchoke());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    optimisticallyUnchokedNeighbour.getIsOptimisticallyUnchoked().set(true);
+                    optimisticallyUnchokedNeighbour.getIsUnchoked().set(true);
+                    optimisticallyUnchokedNeighbour.getIsChoked().set(false);
                 }
+
             }
+
             unchokeablePeersLock.unlock();
         }
 
         
-        public void updateOptUnchokeablePeers(RemotePeer unchokeablePeer){
+        public void updateOptUnchokeablePeers(ArrayList<RemotePeer> unchokeablePeers){
             unchokeablePeersLock.lock();
-            optUnchokeablePeer = unchokeablePeer;
+            optUnchokeablePeers = unchokeablePeers;
             unchokeablePeersLock.unlock();
         }
     }
