@@ -16,6 +16,8 @@ public class RemotePeer {
 	private AtomicBoolean isInterested;
 	private AtomicInteger bytesDownloaded;
 	private BitSet bitSet;
+	private AtomicBoolean isChoked;
+	private AtomicBoolean isUnchoked;
 
 	public RemotePeer(String ipAddress, int port, String peerId, Boolean hasFile) {
 		this.ipAddress = ipAddress;
@@ -24,6 +26,8 @@ public class RemotePeer {
 		this.hasFile = hasFile;
 		this.isInterested = new AtomicBoolean(false);
 		this.bytesDownloaded = new AtomicInteger(0);
+		this.isChoked = new AtomicBoolean(false);
+		this.isUnchoked = new AtomicBoolean(false);
 	}
 
 	public String getIpAddress() {
@@ -88,6 +92,22 @@ public class RemotePeer {
 
 	public void setBitSet(BitSet bitSet) {
 		this.bitSet = bitSet;
+	}
+
+	public AtomicBoolean getIsChoked() {
+		return isChoked;
+	}
+
+	public void setIsChoked(AtomicBoolean isChoked) {
+		this.isChoked = isChoked;
+	}
+
+	public AtomicBoolean getIsUnchoked() {
+		return isUnchoked;
+	}
+
+	public void setIsUnchoked(AtomicBoolean isUnchoked) {
+		this.isUnchoked = isUnchoked;
 	}
 
 }
