@@ -154,29 +154,32 @@ public class PeerHandler{
         public void run(){
             unchokeablePeersLock.lock();
 
-            if(optUnchokeablePeers.size() != 0){
-                Random rand = new Random();
-                if(optimisticallyUnchokedNeighbour != null)
-                    optimisticallyUnchokedNeighbour.getIsOptimisticallyUnchoked().set(false);
+            try{
+                if(optUnchokeablePeers.size() != 0){
+                    Random rand = new Random();
+                    if(optimisticallyUnchokedNeighbour != null)
+                        optimisticallyUnchokedNeighbour.getIsOptimisticallyUnchoked().set(false);
 
-                optimisticallyUnchokedNeighbour = optUnchokeablePeers.get(rand.nextInt(optUnchokeablePeers.size()));
+                    optimisticallyUnchokedNeighbour = optUnchokeablePeers.get(rand.nextInt(optUnchokeablePeers.size()));
 
 
-                if(!optimisticallyUnchokedNeighbour.getIsUnchoked().get()){
+                    if(!optimisticallyUnchokedNeighbour.getIsUnchoked().get()){
 
-                    try {
+
                         optimisticallyUnchokedNeighbour.getConnection().sendMessage(new Unchoke());
-                    } catch (IOException e) {
-                        e.printStackTrace();
+
+                        optimisticallyUnchokedNeighbour.getIsOptimisticallyUnchoked().set(true);
+                        optimisticallyUnchokedNeighbour.getIsUnchoked().set(true);
+                        optimisticallyUnchokedNeighbour.getIsChoked().set(false);
                     }
-                    optimisticallyUnchokedNeighbour.getIsOptimisticallyUnchoked().set(true);
-                    optimisticallyUnchokedNeighbour.getIsUnchoked().set(true);
-                    optimisticallyUnchokedNeighbour.getIsChoked().set(false);
+
                 }
-
+            } catch (IOException e){
+                e.printStackTrace();
             }
-
-            unchokeablePeersLock.unlock();
+            finally {
+                unchokeablePeersLock.unlock();
+            }
         }
 
         
