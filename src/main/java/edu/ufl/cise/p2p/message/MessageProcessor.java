@@ -78,6 +78,10 @@ public class MessageProcessor {
 				return new NotInterested();
 			}
 		case 6:
+			Request request = (Request) message;
+			request.getPieceIndex();
+			System.out.println("Index :" + request.getPieceIndex()
+					+ " requested by peer [" + rPeer.getPeerId() + "]");
 			break;
 		case 7:
 			break;
@@ -96,6 +100,7 @@ public class MessageProcessor {
 			return null;
 		Random r = new Random();
 		int randomListIndex = r.nextInt(neededPieceIndices.size());
+		System.out.println("Requesting piece index :"+neededPieceIndices.get(randomListIndex));
 		return new Request(neededPieceIndices.get(randomListIndex));
 	}
 
