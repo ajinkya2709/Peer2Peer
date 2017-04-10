@@ -99,7 +99,12 @@ public class PeerHandler{
                 for(RemotePeer chokedPeer: chokedPeers){
 
                     try {
-                        chokedPeer.getConnection().sendMessage(new Choke());
+                        if(!chokedPeer.getIsChoked().get()){
+                            chokedPeer.getConnection().sendMessage(new Choke());
+                            chokedPeer.getIsChoked().set(true);
+                            chokedPeer.getIsUnchoked().set(false);
+                        }
+
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -109,7 +114,11 @@ public class PeerHandler{
                 for(RemotePeer preferredNeighbour: prefferedNeighbours){
 
                     try {
-                        preferredNeighbour.getConnection().sendMessage(new Unchoke());
+                        if(!preferredNeighbour.getIsUnchoked().get()){
+                            preferredNeighbour.getConnection().sendMessage(new Unchoke());
+                            preferredNeighbour.getIsUnchoked().set(true);
+                            preferredNeighbour.getIsChoked().set(false);
+                        }
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
