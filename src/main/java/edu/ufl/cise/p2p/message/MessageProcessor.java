@@ -66,7 +66,7 @@ public class MessageProcessor {
 			Bitfield bitfield = (Bitfield) message;
 			BitSet bitSet = bitfield.getBitSet();
 			System.out.println("BitSet of size :" + bitSet.length()
-					+ " received from peer" + rPeer.getPeerId());
+					+ " received from peer :" + rPeer.getPeerId());
 			rPeer.setBitSet(bitSet);
 			bitSet.andNot(fileHandler.getBitSet());
 			if (!bitSet.isEmpty()) {

@@ -27,7 +27,7 @@ public class Message implements Externalizable {
 	public void writeExternal(ObjectOutput out) throws IOException {
 		out.write(length, 0, length.length);
 		out.write(type);
-		out.write(payload, 0, payload.length);
+		out.write(payload, 0, payload == null ? 0 : payload.length);
 	}
 
 	public void readExternal(ObjectInput in) throws IOException,
