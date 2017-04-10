@@ -1,5 +1,6 @@
 package edu.ufl.cise.p2p;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import edu.ufl.cise.p2p.reader.CommonPropReader;
@@ -24,17 +25,21 @@ public class peerProcess {
 		List<RemotePeer> remotePeers = PeerConfigReader.getPeerInfoList(peerId);
 
 		Peer peer = null;
-		for (int i = 0;i < remotePeers.size();i++) {
+		for (int i = 0; i < remotePeers.size(); i++) {
 			RemotePeer rPeer = remotePeers.get(i);
-			if(rPeer.getPeerId().equalsIgnoreCase(peerId)){
-				peer = new Peer(rPeer.getPeerId(),rPeer.getIpAddress(),rPeer.getPort(),rPeer.getHasFile(),remotePeers, common);
-				remotePeers.remove(i);
+			if (rPeer.getPeerId().equalsIgnoreCase(peerId)) {
+				List<RemotePeer> listWithoutCurrent = new ArrayList<RemotePeer>(
+						remotePeers);
+				listWithoutCurrent.remove(i);
+				peer = new Peer(rPeer.getPeerId(), rPeer.getIpAddress(),
+						rPeer.getPort(), rPeer.getHasFile(),
+						listWithoutCurrent, common);
 				break;
 			}
 		}
 
 		System.out.println("Read current and remote peer info");
-		//peer.setCommonProps(common);
+		// peer.setCommonProps(common);
 		peer.init();
 		Thread serverThread = new Thread(peer);
 		serverThread.start();
