@@ -23,6 +23,7 @@ public class RemotePeer {
 		this.peerId = peerId;
 		this.hasFile = hasFile;
 		this.isInterested = new AtomicBoolean(false);
+		this.bytesDownloaded = new AtomicInteger(0);
 	}
 
 	public String getIpAddress() {
