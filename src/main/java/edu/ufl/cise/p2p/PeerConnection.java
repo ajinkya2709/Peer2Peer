@@ -5,6 +5,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.BitSet;
+import java.util.Map;
 
 import edu.ufl.cise.p2p.message.Bitfield;
 import edu.ufl.cise.p2p.message.Handshake;
@@ -20,9 +21,11 @@ public class PeerConnection implements Runnable {
 	ObjectInputStream inStream;
 	ObjectOutputStream outStream;
 	FileHandler fileHandler;
+	Map<String, RemotePeer> remotePeerMap;
 
 	public PeerConnection(Socket socket, String localPeerId, String remotePeer,
-			boolean isClient, FileHandler fileHandler) throws IOException {
+			boolean isClient, FileHandler fileHandler,
+			Map<String, RemotePeer> remotePeerMap) throws IOException {
 		this.socket = socket;
 		this.localPeerId = localPeerId;
 		this.remotePeerId = remotePeer;
@@ -31,6 +34,7 @@ public class PeerConnection implements Runnable {
 		this.outStream.flush();
 		this.inStream = new ObjectInputStream(socket.getInputStream());
 		this.fileHandler = fileHandler;
+		this.remotePeerMap = remotePeerMap;
 	}
 
 	public void run() {
@@ -43,14 +47,26 @@ public class PeerConnection implements Runnable {
 					+ "] received Handshake from Peer :["
 					+ handShakeReceived.getPeerId() + "]");
 			// If it's a client, we have to verify expected server
+			if (remotePeerId.isEmpty()) {
+				remotePeerId = String.valueOf(handShakeReceived.getPeerId());
+				remotePeerMap.get(remotePeerId).setConnection(this);
+			}
 
 			MessageProcessor processor = new MessageProcessor(fileHandler);
 			Message response = processor.createResponse(handShakeReceived);
 			sendMessage(response);
-			
+
 			Bitfield bitfield = (Bitfield) inStream.readObject();
 			BitSet received = bitfield.getBitSet();
-			System.out.println("Peer :"+handShakeReceived+" has bitfield of size :"+received.length());
+			System.out.println("Peer :" + handShakeReceived
+					+ " has bitfield of size :" + received.length());
+
+			while (true) {
+				Message message = (Message) inStream.readObject();
+				response = processor.createResponse(message);
+				sendMessage(response);
+			}
+
 		} catch (NumberFormatException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -64,7 +80,7 @@ public class PeerConnection implements Runnable {
 
 	}
 
-	private void sendMessage(Message response) throws IOException {
+	public void sendMessage(Message response) throws IOException {
 		if (response == null)
 			return;
 		outStream.writeObject(response);
