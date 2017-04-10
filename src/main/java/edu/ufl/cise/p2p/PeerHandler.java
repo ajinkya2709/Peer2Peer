@@ -58,6 +58,7 @@ public class PeerHandler{
             commonProp = prop;
             this.hasFile.set(hasFile);
             this.optUnchokedScheduler = optUnchokedScheduler;
+            prefferedNeighbours = new ArrayList<RemotePeer>();
         }
 
         public void run(){
@@ -86,7 +87,10 @@ public class PeerHandler{
                 LinkedList<RemotePeer> chokedPeers = new LinkedList<RemotePeer>(remotePeers);
                 chokedPeers.removeAll(prefferedNeighbours);
 
-                optUnchokedNeighbour = interestedPeers.get(prefferedNeighbours.size());
+                if(interestedPeers.size() <= prefferedNeighbours.size())
+                    optUnchokedNeighbour = null;
+                else
+                    optUnchokedNeighbour = interestedPeers.get(prefferedNeighbours.size());
 
                 optUnchokedScheduler.unchokeablePeersLock.lock();
                 optUnchokedScheduler.updateOptUnchokeablePeers(optUnchokedNeighbour);
