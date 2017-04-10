@@ -4,10 +4,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.BitSet;
 import java.util.Map;
 
-import edu.ufl.cise.p2p.message.Bitfield;
 import edu.ufl.cise.p2p.message.Handshake;
 import edu.ufl.cise.p2p.message.Message;
 import edu.ufl.cise.p2p.message.MessageProcessor;
@@ -56,15 +54,16 @@ public class PeerConnection implements Runnable {
 			Message response = processor.createResponse(handShakeReceived);
 			sendMessage(response);
 
-			//Code to test Bitfield.
-			Bitfield bitfield = (Bitfield) inStream.readObject();
+			// Code to test Bitfield.
+			/*Bitfield bitfield = (Bitfield) inStream.readObject();
 			BitSet received = bitfield.getBitSet();
 			System.out.println("Peer :" + handShakeReceived
-					+ " has bitfield of size :" + received.length());
+					+ " has bitfield of size :" + received.length());*/
 
 			while (true) {
 				Message message = (Message) inStream.readObject();
-				response = processor.createResponse(message, remotePeerMap.get(remotePeerId));
+				response = processor.createResponse(message,
+						remotePeerMap.get(remotePeerId));
 				sendMessage(response);
 			}
 
