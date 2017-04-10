@@ -63,52 +63,54 @@ public class PeerHandler{
         public void run(){
             interestedPeers = getInterestedRemotePeers();
 
-            if(hasFile.get()){
-                Collections.shuffle(interestedPeers);
-            }
-            else{
-                Collections.sort(interestedPeers, new Comparator<RemotePeer>() {
-                    public int compare(RemotePeer r1, RemotePeer r2) {
-                        // Sort in decreasing order
-                        return (r2.getBytesDownloaded().get() - r1.getBytesDownloaded().get());
+            if(interestedPeers.size() != 0){
+                if(hasFile.get()){
+                    Collections.shuffle(interestedPeers);
+                }
+                else{
+                    Collections.sort(interestedPeers, new Comparator<RemotePeer>() {
+                        public int compare(RemotePeer r1, RemotePeer r2) {
+                            // Sort in decreasing order
+                            return (r2.getBytesDownloaded().get() - r1.getBytesDownloaded().get());
+                        }
+                    });
+                }
+
+                for(RemotePeer i : remotePeers)
+                    i.getBytesDownloaded().set(0);
+
+                prefferedNeighbours.clear();
+                prefferedNeighbours.addAll(interestedPeers.subList(0,
+                        Math.min(commonProp.getNumberOfPreferredNeighbors(),interestedPeers.size())));
+
+                LinkedList<RemotePeer> chokedPeers = new LinkedList<RemotePeer>(remotePeers);
+                chokedPeers.removeAll(prefferedNeighbours);
+
+                optUnchokedNeighbour = interestedPeers.get(prefferedNeighbours.size());
+
+                optUnchokedScheduler.unchokeablePeersLock.lock();
+                optUnchokedScheduler.updateOptUnchokeablePeers(optUnchokedNeighbour);
+                optUnchokedScheduler.unchokeablePeersLock.unlock();
+
+                for(RemotePeer chokedPeer: chokedPeers){
+
+                    try {
+                        chokedPeer.getConnection().sendMessage(new Choke());
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
-                });
-            }
 
-            for(RemotePeer i : remotePeers)
-                i.getBytesDownloaded().set(0);
-
-            prefferedNeighbours.clear();
-            prefferedNeighbours.addAll(interestedPeers.subList(0,
-                    Math.min(commonProp.getNumberOfPreferredNeighbors(),interestedPeers.size())));
-
-            LinkedList<RemotePeer> chokedPeers = new LinkedList<RemotePeer>(remotePeers);
-            chokedPeers.removeAll(prefferedNeighbours);
-
-            optUnchokedNeighbour = interestedPeers.get(prefferedNeighbours.size());
-
-            optUnchokedScheduler.unchokeablePeersLock.lock();
-            optUnchokedScheduler.updateOptUnchokeablePeers(optUnchokedNeighbour);
-            optUnchokedScheduler.unchokeablePeersLock.unlock();
-
-            for(RemotePeer chokedPeer: chokedPeers){
-
-                try {
-                    chokedPeer.getConnection().sendMessage(new Choke());
-                } catch (IOException e) {
-                    e.printStackTrace();
                 }
 
-            }
+                for(RemotePeer preferredNeighbour: prefferedNeighbours){
 
-            for(RemotePeer preferredNeighbour: prefferedNeighbours){
+                    try {
+                        preferredNeighbour.getConnection().sendMessage(new Unchoke());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
 
-                try {
-                    preferredNeighbour.getConnection().sendMessage(new Unchoke());
-                } catch (IOException e) {
-                    e.printStackTrace();
                 }
-
             }
 
         }
