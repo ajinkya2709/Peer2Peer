@@ -6,6 +6,8 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Peer implements Runnable {
 
@@ -16,7 +18,7 @@ public class Peer implements Runnable {
 	private Boolean hasFile;
 	private PeerHandler peerHandler;
 	private FileHandler fileHandler;
-	List<RemotePeer> remotePeers;
+	private Map<String, RemotePeer> remotePeerMap;
 
 	public Peer() {
 
@@ -34,9 +36,13 @@ public class Peer implements Runnable {
 		this.host = host;
 		this.port = port;
 		this.hasFile = hasFile;
-		this.remotePeers = remotePeers;
+		this.remotePeerMap = new ConcurrentHashMap<String, RemotePeer>();
+		for (RemotePeer rPeer : remotePeers) {
+			remotePeerMap.put(rPeer.getPeerId(), rPeer);
+		}
 		this.commonProps = commonProps;
-		this.peerHandler = new PeerHandler(new ArrayList<RemotePeer>(remotePeers), commonProps, hasFile);
+		this.peerHandler = new PeerHandler(new ArrayList<RemotePeer>(
+				remotePeers), commonProps, hasFile);
 		this.fileHandler = new FileHandler(commonProps.getPieceSize(),
 				commonProps.getFileSize(), commonProps.getFileName());
 	}
@@ -103,15 +109,19 @@ public class Peer implements Runnable {
 
 	}
 
-	private void createNewConnection(Socket socket, String peerId,
+	private PeerConnection createNewConnection(Socket socket, String peerId,
 			String remotePeerId, boolean isClient) {
+		PeerConnection connection = null;
 		try {
-			new Thread(new PeerConnection(socket, id, remotePeerId, isClient,
-					fileHandler)).start();
+			connection = new PeerConnection(socket, id, remotePeerId, isClient,
+					fileHandler, remotePeerMap);
+			new Thread(connection).start();
+
 		} catch (IOException e) {
 			System.out.println("IO Exception while creating a new Connection");
 			e.printStackTrace();
 		}
+		return connection;
 	}
 
 	public void connectToRemotePeers(List<RemotePeer> remotePeers) {
@@ -123,8 +133,9 @@ public class Peer implements Runnable {
 						+ " at:" + rPeer.getPort());
 				Socket socket = new Socket(rPeer.getIpAddress(),
 						rPeer.getPort());
-				createNewConnection(socket, id, rPeer.getPeerId(), true);
-
+				PeerConnection connection = createNewConnection(socket, id,
+						rPeer.getPeerId(), true);
+				rPeer.setConnection(connection);
 			} catch (UnknownHostException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
