@@ -24,9 +24,11 @@ public class peerProcess {
 		List<RemotePeer> remotePeers = PeerConfigReader.getPeerInfoList(peerId);
 
 		Peer peer = null;
-		for (RemotePeer rPeer : remotePeers) {
+		for (int i = 0;i < remotePeers.size();i++) {
+			RemotePeer rPeer = remotePeers.get(i);
 			if(rPeer.getPeerId().equalsIgnoreCase(peerId)){
 				peer = new Peer(rPeer.getPeerId(),rPeer.getIpAddress(),rPeer.getPort(),rPeer.getHasFile(),remotePeers, common);
+				remotePeers.remove(i);
 				break;
 			}
 		}
