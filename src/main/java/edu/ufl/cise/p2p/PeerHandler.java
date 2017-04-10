@@ -1,5 +1,9 @@
 package edu.ufl.cise.p2p;
 
+import edu.ufl.cise.p2p.message.Choke;
+import edu.ufl.cise.p2p.message.Unchoke;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -88,11 +92,23 @@ public class PeerHandler{
             optUnchokedScheduler.unchokeablePeersLock.unlock();
 
             for(RemotePeer chokedPeer: chokedPeers){
-                //TODO send choke message to choked peers
+
+                try {
+                    chokedPeer.getConnection().sendMessage(new Choke());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
             }
 
             for(RemotePeer preferredNeighbour: prefferedNeighbours){
-                //TODO send choke message to choked peers
+
+                try {
+                    preferredNeighbour.getConnection().sendMessage(new Unchoke());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
             }
 
         }
@@ -122,7 +138,11 @@ public class PeerHandler{
         public void run(){
             unchokeablePeersLock.lock();
             if(optUnchokeablePeer != null) {
-                //TODO send unchoked message to optimistically unchoked neighbour
+                try {
+                    optUnchokeablePeer.getConnection().sendMessage(new Unchoke());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
             unchokeablePeersLock.unlock();
         }
