@@ -1,6 +1,9 @@
 package edu.ufl.cise.p2p.message;
 
+import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.List;
+import java.util.Random;
 
 import edu.ufl.cise.p2p.FileHandler;
 import edu.ufl.cise.p2p.RemotePeer;
@@ -34,8 +37,7 @@ public class MessageProcessor {
 			System.out.println("Received UNCHOKE from peer :"
 					+ rPeer.getPeerId());
 			isChoked = false;
-			// Request a Piece
-			break;
+			return getRandomPieceIndex(rPeer);
 		case 2:
 			System.out.println("Received INTERESTED from peer :"
 					+ rPeer.getPeerId());
@@ -51,6 +53,7 @@ public class MessageProcessor {
 			rPeer.getIsInterested().set(false);
 			break;
 		case 4:
+			System.out.println("Received HAVE from peer :" + rPeer.getPeerId());
 			Have have = (Have) message;
 			int index = have.getIndex();
 			if (fileHandler.getBitSet().get(index)) {
@@ -80,6 +83,20 @@ public class MessageProcessor {
 			break;
 		}
 		return null;
+	}
+
+	private Message getRandomPieceIndex(RemotePeer rPeer) {
+		BitSet copy = (BitSet) rPeer.getBitSet().clone();
+		copy.andNot(fileHandler.getBitSet());
+		List<Integer> neededPieceIndices = new ArrayList<Integer>();
+		for (int i = copy.nextSetBit(0); i >= 0; i = copy.nextSetBit(i + 1)) {
+			neededPieceIndices.add(i);
+		}
+		if (neededPieceIndices.isEmpty())
+			return null;
+		Random r = new Random();
+		int randomListIndex = r.nextInt(neededPieceIndices.size());
+		return new Request(neededPieceIndices.get(randomListIndex));
 	}
 
 }
