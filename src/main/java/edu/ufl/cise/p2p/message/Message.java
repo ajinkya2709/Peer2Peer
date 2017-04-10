@@ -39,4 +39,7 @@ public class Message implements Externalizable {
 		in.read(payload, 0, messageLength - 1);
 	}
 
+	public int getType() {
+		return (int) type;
+	}
 }
