@@ -89,9 +89,8 @@ public class MessageProcessor {
 			int indexOfPieceRequested = request.getPieceIndex();
 			System.out.println("Index :" + indexOfPieceRequested
 					+ " requested by peer [" + rPeer.getPeerId() + "]");
-			new Piece(indexOfPieceRequested,
-					fileHandler.getDataFromPiece(indexOfPieceRequested));
-			break;
+			byte[] data = fileHandler.getDataFromPiece(indexOfPieceRequested);
+			return new Piece(indexOfPieceRequested, data);
 		case 7:
 			Piece piece = (Piece) message;
 			System.out.println("Piece received from peer [" + rPeer.getPeerId()

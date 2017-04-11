@@ -19,6 +19,7 @@ public class Piece extends Message {
 				: content.length)];
 		byte[] pieceIndex = ByteBuffer.allocate(4).putInt(index).array();
 		System.arraycopy(pieceIndex, 0, totalPayload, 0, pieceIndex.length);
+		if(content != null)
 		System.arraycopy(content, 0, totalPayload, pieceIndex.length,
 				content.length);
 		return totalPayload;
