@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Peer implements Runnable {
 
@@ -15,7 +16,7 @@ public class Peer implements Runnable {
 	private String id;
 	private String host;
 	private int port;
-	private Boolean hasFile;
+	private AtomicBoolean hasFile;
 	private PeerHandler peerHandler;
 	private FileHandler fileHandler;
 	private Map<String, RemotePeer> remotePeerMap;
@@ -26,7 +27,7 @@ public class Peer implements Runnable {
 
 	public void init() {
 		peerHandler.sendChokeAndUnchokeMessages();
-		if (hasFile) {
+		if (hasFile.get()) {
 			fileHandler.splitFile(commonProps.getFileName());
 			fileHandler.setAllPieces();
 		} else {
@@ -40,14 +41,14 @@ public class Peer implements Runnable {
 		this.id = id;
 		this.host = host;
 		this.port = port;
-		this.hasFile = hasFile;
+		this.hasFile = hasFile ? new AtomicBoolean(true) : new AtomicBoolean(false);
 		this.remotePeerMap = new ConcurrentHashMap<String, RemotePeer>();
 		for (RemotePeer rPeer : remotePeers) {
 			remotePeerMap.put(rPeer.getPeerId(), rPeer);
 		}
 		this.commonProps = commonProps;
 		this.peerHandler = new PeerHandler(new ArrayList<RemotePeer>(
-				remotePeers), commonProps, hasFile, Integer.parseInt(id));
+				remotePeers), commonProps, this, Integer.parseInt(id));
 		this.fileHandler = new FileHandler(commonProps.getPieceSize(),
 				commonProps.getFileSize(), commonProps.getFileName(), id);
 	}
@@ -84,11 +85,12 @@ public class Peer implements Runnable {
 		this.port = port;
 	}
 
-	public Boolean getHasFile() {
+
+	public AtomicBoolean getHasFile() {
 		return hasFile;
 	}
 
-	public void setHasFile(Boolean hasFile) {
+	public void setHasFile(AtomicBoolean hasFile) {
 		this.hasFile = hasFile;
 	}
 
@@ -119,7 +121,7 @@ public class Peer implements Runnable {
 		PeerConnection connection = null;
 		try {
 			connection = new PeerConnection(socket, id, remotePeerId, isClient,
-					fileHandler, remotePeerMap);
+					fileHandler, remotePeerMap, this);
 			new Thread(connection).start();
 
 		} catch (IOException e) {

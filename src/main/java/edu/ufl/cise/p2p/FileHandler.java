@@ -73,7 +73,7 @@ public class FileHandler {
 	}
 
 	public void setAllPieces() {
-		System.out.println("Size of bitset is:" + bitSet.size());
+		//System.out.println("Size of bitset is:" + bitSet.size());
 		for (int i = 0; i < bitSet.size(); i++)
 			bitSet.set(i);
 	}
@@ -112,7 +112,7 @@ public class FileHandler {
 			}
 			fis.close();
 			totalParts = partNumber;
-			System.out.println("Total Parts :" + totalParts);
+			//System.out.println("Total Parts :" + totalParts);
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

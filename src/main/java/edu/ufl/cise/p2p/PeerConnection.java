@@ -12,7 +12,6 @@ import edu.ufl.cise.p2p.message.Handshake;
 import edu.ufl.cise.p2p.message.Message;
 import edu.ufl.cise.p2p.message.MessageProcessor;
 
-
 public class PeerConnection implements Runnable {
 
 	Socket socket;
@@ -23,10 +22,12 @@ public class PeerConnection implements Runnable {
 	ObjectOutputStream outStream;
 	FileHandler fileHandler;
 	Map<String, RemotePeer> remotePeerMap;
+	Peer localPeer;
 
 	public PeerConnection(Socket socket, String localPeerId, String remotePeer,
 			boolean isClient, FileHandler fileHandler,
-			Map<String, RemotePeer> remotePeerMap) throws IOException {
+			Map<String, RemotePeer> remotePeerMap, Peer peer)
+			throws IOException {
 		this.socket = socket;
 		this.localPeerId = localPeerId;
 		this.remotePeerId = remotePeer;
@@ -36,6 +37,7 @@ public class PeerConnection implements Runnable {
 		this.inStream = new ObjectInputStream(socket.getInputStream());
 		this.fileHandler = fileHandler;
 		this.remotePeerMap = remotePeerMap;
+		this.localPeer = peer;
 	}
 
 	public void run() {
@@ -54,15 +56,18 @@ public class PeerConnection implements Runnable {
 			}
 			Log.logTCPConnection(localPeerId, remotePeerId);
 
-			MessageProcessor processor = new MessageProcessor(fileHandler,new ArrayList<RemotePeer>(remotePeerMap.values()));
+			MessageProcessor processor = new MessageProcessor(fileHandler,
+					new ArrayList<RemotePeer>(remotePeerMap.values()),localPeer);
 			Message response = processor.createResponse(handShakeReceived);
 			sendMessage(response);
 
 			// Code to test Bitfield.
-			/*Bitfield bitfield = (Bitfield) inStream.readObject();
-			BitSet received = bitfield.getBitSet();
-			System.out.println("Peer :" + handShakeReceived
-					+ " has bitfield of size :" + received.length());*/
+			/*
+			 * Bitfield bitfield = (Bitfield) inStream.readObject(); BitSet
+			 * received = bitfield.getBitSet(); System.out.println("Peer :" +
+			 * handShakeReceived + " has bitfield of size :" +
+			 * received.length());
+			 */
 
 			while (true) {
 				Message message = (Message) inStream.readObject();
