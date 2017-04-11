@@ -108,8 +108,11 @@ public class MessageProcessor {
 			rPeer.getBytesDownloaded().getAndAdd(piece.getContent().length);
 			for(RemotePeer remote: remotePeers){
 				if(remote.getConnection() == null) continue;
-				if(!remote.getBitSet().get(pieceIndex))
+				if(!remote.getBitSet().get(pieceIndex)){
+					System.out.println("Sending HAVE Message to ["+remote.getPeerId()+"]");
 					remote.getConnection().sendMessage(new Have(pieceIndex));
+				}
+					
 			}
 			if (fileHandler.getNeededPieces().isEmpty()) {
 				fileHandler.mergeFilesInto(fileHandler.getBitSetLength());
