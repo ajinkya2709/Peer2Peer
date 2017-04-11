@@ -36,6 +36,7 @@ public class RemotePeer {
 		this.isPreferredNeighbor = new AtomicBoolean(false);
 		this.isOptimisticallyUnchoked = new AtomicBoolean(false);
 		this.requestedPieces = new HashSet<Integer>();
+		this.bitSet = new BitSet(0);
 	}
 
 	public String getIpAddress() {
