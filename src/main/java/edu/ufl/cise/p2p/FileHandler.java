@@ -133,17 +133,17 @@ public class FileHandler {
 			File filePart = null;
 			fos = new FileOutputStream(original, true);
 			// change needed to use totalParts variable
-			System.out.println("total parts :" + parts);
+			//System.out.println("total parts :" + parts);
 			for (int i = 0; i < parts; i++) {
 				partName = original.getParent() + "/" + partsDirectory + "/"
 						+ "file.part" + String.valueOf(i);
 				filePart = new File(partName);
-				System.out.println(filePart.getAbsolutePath() + "  "
-						+ filePart.exists());
+				/*System.out.println(filePart.getAbsolutePath() + "  "
+						+ filePart.exists());*/
 				fis = new FileInputStream(filePart);
 				bytes = new byte[(int) filePart.length()];
 				fis.read(bytes, 0, (int) filePart.length());
-				System.out.println(new String(bytes));
+				//System.out.println(new String(bytes));
 				fos.write(bytes);
 				fos.flush();
 				bytes = null;
