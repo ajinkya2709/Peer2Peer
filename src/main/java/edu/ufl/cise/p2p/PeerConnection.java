@@ -6,11 +6,10 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.Map;
 
+import edu.ufl.cise.p2p.log.Log;
 import edu.ufl.cise.p2p.message.Handshake;
 import edu.ufl.cise.p2p.message.Message;
 import edu.ufl.cise.p2p.message.MessageProcessor;
-import edu.ufl.cise.p2p.log.Log;
-import edu.ufl.cise.p2p.log.Logfile;
 
 
 public class PeerConnection implements Runnable {
