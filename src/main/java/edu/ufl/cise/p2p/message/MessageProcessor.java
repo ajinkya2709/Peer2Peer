@@ -78,7 +78,7 @@ public class MessageProcessor {
 		case 5:
 			Bitfield bitfield = (Bitfield) message;
 			BitSet bitSet = bitfield.getBitSet();
-			System.out.println("BitSet of size :" + bitSet.length()
+			System.out.println("BitSet of size :" + bitSet.size()
 					+ " received from peer :" + rPeer.getPeerId());
 			rPeer.setBitSet(bitSet);
 			bitSet.andNot(fileHandler.getBitSet());
