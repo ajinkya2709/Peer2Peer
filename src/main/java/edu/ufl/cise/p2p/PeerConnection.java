@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Map;
 
 import edu.ufl.cise.p2p.log.Log;
@@ -53,7 +54,7 @@ public class PeerConnection implements Runnable {
 			}
 			Log.logTCPConnection(localPeerId, remotePeerId);
 
-			MessageProcessor processor = new MessageProcessor(fileHandler);
+			MessageProcessor processor = new MessageProcessor(fileHandler,new ArrayList<RemotePeer>(remotePeerMap.values()));
 			Message response = processor.createResponse(handShakeReceived);
 			sendMessage(response);
 
@@ -83,10 +84,15 @@ public class PeerConnection implements Runnable {
 
 	}
 
-	public void sendMessage(Message response) throws IOException {
+	public void sendMessage(Message response) {
 		if (response == null)
 			return;
-		outStream.writeObject(response);
+		try {
+			outStream.writeObject(response);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }
