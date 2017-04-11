@@ -20,10 +20,10 @@ public class PeerHandler{
     OptimisticallyUnchokedNeighbour optimisticallyUnchokedTask;
     CommonPeerProperties commonProp;
 
-    public PeerHandler(ArrayList<RemotePeer> peers, CommonPeerProperties prop, Boolean hasFile, int peerId){
+    public PeerHandler(ArrayList<RemotePeer> peers, CommonPeerProperties prop, Peer localPeer, int peerId){
 
         optimisticallyUnchokedTask = new OptimisticallyUnchokedNeighbour(prop,peerId);
-        preferredNeighboursTask = new PreferredNeighbours(peers, prop, hasFile, optimisticallyUnchokedTask,peerId);
+        preferredNeighboursTask = new PreferredNeighbours(peers, prop, localPeer, optimisticallyUnchokedTask,peerId);
         commonProp = prop;
 
     }
@@ -46,7 +46,7 @@ public class PeerHandler{
 
         ArrayList<RemotePeer> remotePeers;
         CommonPeerProperties commonProp;
-        AtomicBoolean hasFile = new AtomicBoolean(false);
+        AtomicBoolean hasFile;
         ArrayList<RemotePeer> interestedPeers;
         ArrayList<RemotePeer> preferredNeighbours;
         OptimisticallyUnchokedNeighbour optUnchokedScheduler;
@@ -54,11 +54,11 @@ public class PeerHandler{
         int localPeerId;
 
         public PreferredNeighbours(ArrayList<RemotePeer> peers, CommonPeerProperties prop,
-                                   Boolean hasFile,
+                                   Peer localPeer,
                                    OptimisticallyUnchokedNeighbour optUnchokedScheduler,int peerId){
             remotePeers = peers;
             commonProp = prop;
-            this.hasFile.set(hasFile);
+            this.hasFile = localPeer.getHasFile();
             this.optUnchokedScheduler = optUnchokedScheduler;
             preferredNeighbours = new ArrayList<RemotePeer>();
             optUnchokedNeighbours = new ArrayList<RemotePeer>();
