@@ -29,6 +29,8 @@ public class Peer implements Runnable {
 		if (hasFile){
 			fileHandler.splitFile(commonProps.getFileName());
 			fileHandler.setAllPieces();
+		}else{
+			fileHandler.calculateRequiredPieces();
 		}
 			
 	}
@@ -47,7 +49,7 @@ public class Peer implements Runnable {
 		this.peerHandler = new PeerHandler(new ArrayList<RemotePeer>(
 				remotePeers), commonProps, hasFile);
 		this.fileHandler = new FileHandler(commonProps.getPieceSize(),
-				commonProps.getFileSize(), commonProps.getFileName());
+				commonProps.getFileSize(), commonProps.getFileName(), id);
 	}
 
 	public CommonPeerProperties getCommonProps() {
