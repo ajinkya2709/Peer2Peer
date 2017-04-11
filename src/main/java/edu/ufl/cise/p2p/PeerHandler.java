@@ -78,9 +78,9 @@ public class PeerHandler{
                 for(RemotePeer i : remotePeers)
                     i.getBytesDownloaded().set(0);
 
-                clearPreviousPreferredNeighbours();
+                clearPreviousPreferredNeighbours(); //clearing previous preferredNeighbours from the list
                 preferredNeighbours.addAll(interestedPeers.subList(0,
-                        Math.min(commonProp.getNumberOfPreferredNeighbors(),interestedPeers.size())));
+                        Math.min(commonProp.getNumberOfPreferredNeighbors(),interestedPeers.size())));  //updating preferredNeighbours
 
                 LinkedList<RemotePeer> chokedPeers = new LinkedList<RemotePeer>(remotePeers);
                 chokedPeers.removeAll(preferredNeighbours);
@@ -160,6 +160,8 @@ public class PeerHandler{
                     if(optimisticallyUnchokedNeighbour != null)
                         optimisticallyUnchokedNeighbour.getIsOptimisticallyUnchoked().set(false);
 
+
+                    //Randomly selecting optimisticUnchokedNeighbour
                     optimisticallyUnchokedNeighbour = optUnchokeablePeers.get(rand.nextInt(optUnchokeablePeers.size()));
 
 
