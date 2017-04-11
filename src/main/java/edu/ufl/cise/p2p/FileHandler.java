@@ -244,7 +244,7 @@ public class FileHandler {
 	}
 
 	public void calculateRequiredPieces() {
-		for (int i = 0; i < bitSet.size(); i++)
+		for (int i = 0; i < bitSetLength; i++)
 			neededPieces.add(i);
 	}
 
