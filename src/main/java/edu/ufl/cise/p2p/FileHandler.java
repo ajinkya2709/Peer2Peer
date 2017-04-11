@@ -6,6 +6,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.BitSet;
+import java.util.HashSet;
+import java.util.Set;
 
 public class FileHandler {
 
@@ -16,13 +18,18 @@ public class FileHandler {
 	private BitSet bitSet;
 	private int totalParts;
 	private String partsDirectory = "parts";
+	private String forPeerId;
+	private Set<Integer> neededPieces;
 
-	public FileHandler(int pieceSize, int fileSize, String completeFilePath) {
+	public FileHandler(int pieceSize, int fileSize, String completeFilePath,
+			String forPeerId) {
 		this.pieceSize = pieceSize;
 		this.fileSize = fileSize;
 		this.bitSetLength = (int) Math.ceil(1.0 * fileSize / pieceSize);
 		this.bitSet = new BitSet(bitSetLength);
 		this.completeFilePath = completeFilePath;
+		this.forPeerId = forPeerId;
+		this.neededPieces = new HashSet<Integer>();
 	}
 
 	public int getPieceSize() {
@@ -115,13 +122,13 @@ public class FileHandler {
 		}
 	}
 
-	public void mergeFilesInto(String fileName, int parts) {
+	public void mergeFilesInto(int parts) {
 		FileInputStream fis = null;
 		FileOutputStream fos = null;
 		String partName = null;
 		byte[] bytes = null;
 		try {
-			File original = new File(fileName);
+			File original = new File(completeFilePath);
 			original.createNewFile();
 			File filePart = null;
 			fos = new FileOutputStream(original, true);
@@ -202,6 +209,43 @@ public class FileHandler {
 			e.printStackTrace();
 		}
 
+	}
+
+	public int getTotalParts() {
+		return totalParts;
+	}
+
+	public void setTotalParts(int totalParts) {
+		this.totalParts = totalParts;
+	}
+
+	public String getPartsDirectory() {
+		return partsDirectory;
+	}
+
+	public void setPartsDirectory(String partsDirectory) {
+		this.partsDirectory = partsDirectory;
+	}
+
+	public String getForPeerId() {
+		return forPeerId;
+	}
+
+	public void setForPeerId(String forPeerId) {
+		this.forPeerId = forPeerId;
+	}
+
+	public Set<Integer> getNeededPieces() {
+		return neededPieces;
+	}
+
+	public void setNeededPieces(Set<Integer> neededPieces) {
+		this.neededPieces = neededPieces;
+	}
+
+	public void calculateRequiredPieces() {
+		for (int i = 0; i < bitSet.size(); i++)
+			neededPieces.add(i);
 	}
 
 	/*
