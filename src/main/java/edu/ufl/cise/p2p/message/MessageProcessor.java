@@ -34,13 +34,15 @@ public class MessageProcessor {
 			System.out
 					.println("Received CHOKE from peer :" + rPeer.getPeerId());
 			isChoked = true;
+			fileHandler.getNeededPieces().addAll(rPeer.getRequestedPieces());
+			rPeer.getRequestedPieces().clear();
 			break;
 		case 1:
 			Log.logUnchoking(rPeer.getPeerId());
 			System.out.println("Received UNCHOKE from peer :"
 					+ rPeer.getPeerId());
 			isChoked = false;
-			return getRandomPieceIndex(rPeer);
+			return getRequestMessage(rPeer);
 
 		case 2:
 			Log.logReceivedInterested(rPeer.getPeerId());
@@ -63,6 +65,7 @@ public class MessageProcessor {
 			Have have = (Have) message;
 			int index = have.getIndex();
 			Log.logReceivedHave(rPeer.getPeerId(), have.getIndex());
+			rPeer.getBitSet().set(index);
 			if (fileHandler.getBitSet().get(index)) {
 				System.out.println("Peer already has part of index: " + index
 						+ ". Sending NOT interested");
@@ -94,31 +97,42 @@ public class MessageProcessor {
 		case 7:
 			Piece piece = (Piece) message;
 			int pieceIndex = piece.getIndex();
+			rPeer.getRequestedPieces().remove(pieceIndex);
 			System.out.println("Piece of index [" + piece.getIndex()
 					+ "] received from peer [" + rPeer.getPeerId() + "]");
 			System.out.println(new String(piece.getContent()));
 			fileHandler.writePieceData(pieceIndex, piece.getContent());
 			fileHandler.getBitSet().set(pieceIndex);
+			rPeer.getBytesDownloaded().getAndAdd(piece.getContent().length);
+			if (fileHandler.getNeededPieces().isEmpty()) {
+				fileHandler.mergeFilesInto(fileHandler.getBitSet().size());
+				break;
+			}
 			if (!isChoked)
-				return getRandomPieceIndex(rPeer);
+				return getRequestMessage(rPeer);
 		}
 		return null;
 	}
 
-	private Message getRandomPieceIndex(RemotePeer rPeer) {
+	private Message getRequestMessage(RemotePeer rPeer) {
 		BitSet copy = (BitSet) rPeer.getBitSet().clone();
 		copy.andNot(fileHandler.getBitSet());
-		List<Integer> neededPieceIndices = new ArrayList<Integer>();
-		for (int i = copy.nextSetBit(0); i >= 0; i = copy.nextSetBit(i + 1)) {
-			neededPieceIndices.add(i);
+		List<Integer> reqPieceIndices = new ArrayList<Integer>();
+		for (int i = copy.nextSetBit(0); i >= 0
+				&& fileHandler.getNeededPieces().contains(i); i = copy
+				.nextSetBit(i + 1)) {
+			reqPieceIndices.add(i);
 		}
-		if (neededPieceIndices.isEmpty())
+		if (reqPieceIndices.isEmpty())
 			return null;
 		Random r = new Random();
-		int randomListIndex = r.nextInt(neededPieceIndices.size());
+		int randomListIndex = r.nextInt(reqPieceIndices.size());
 		System.out.println("Requesting piece index :"
-				+ neededPieceIndices.get(randomListIndex));
-		return new Request(neededPieceIndices.get(randomListIndex));
+				+ reqPieceIndices.get(randomListIndex));
+		int pieceIndex = reqPieceIndices.get(randomListIndex);
+		fileHandler.getNeededPieces().remove(pieceIndex);
+		rPeer.getRequestedPieces().add(pieceIndex);
+		return new Request(pieceIndex);
 	}
 
 }
