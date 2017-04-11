@@ -26,13 +26,13 @@ public class Peer implements Runnable {
 
 	public void init() {
 		peerHandler.sendChokeAndUnchokeMessages();
-		if (hasFile){
+		if (hasFile) {
 			fileHandler.splitFile(commonProps.getFileName());
 			fileHandler.setAllPieces();
-		}else{
+		} else {
 			fileHandler.calculateRequiredPieces();
 		}
-			
+
 	}
 
 	public Peer(String id, String host, int port, Boolean hasFile,
@@ -47,7 +47,7 @@ public class Peer implements Runnable {
 		}
 		this.commonProps = commonProps;
 		this.peerHandler = new PeerHandler(new ArrayList<RemotePeer>(
-				remotePeers), commonProps, hasFile);
+				remotePeers), commonProps, hasFile, Integer.parseInt(id));
 		this.fileHandler = new FileHandler(commonProps.getPieceSize(),
 				commonProps.getFileSize(), commonProps.getFileName(), id);
 	}
