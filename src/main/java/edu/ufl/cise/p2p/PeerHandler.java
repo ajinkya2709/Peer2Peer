@@ -94,32 +94,19 @@ public class PeerHandler{
                 optUnchokedScheduler.updateOptUnchokeablePeers(optUnchokedNeighbours);
 
                 for(RemotePeer chokedPeer: chokedPeers){
-
-                    try {
-                        if(!chokedPeer.getIsChoked().get() && chokedPeer.getConnection() != null){
-                            chokedPeer.getConnection().sendMessage(new Choke());
-                            chokedPeer.getIsChoked().set(true);
-                            chokedPeer.getIsUnchoked().set(false);
-                        }
-
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                    if(!chokedPeer.getIsChoked().get() && chokedPeer.getConnection() != null) {
+                        chokedPeer.getConnection().sendMessage(new Choke());    //sending choke message to choked peers
+                        chokedPeer.getIsChoked().set(true);
+                        chokedPeer.getIsUnchoked().set(false);
                     }
-
                 }
 
                 for(RemotePeer preferredNeighbour: preferredNeighbours){
-
-                    try {
-                        if(!preferredNeighbour.getIsUnchoked().get()){
-                            preferredNeighbour.getConnection().sendMessage(new Unchoke());
-                            preferredNeighbour.getIsUnchoked().set(true);
-                            preferredNeighbour.getIsChoked().set(false);
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                    if(!preferredNeighbour.getIsUnchoked().get()){
+                        preferredNeighbour.getConnection().sendMessage(new Unchoke());  //sending unchoke to preferred neighbours
+                        preferredNeighbour.getIsUnchoked().set(true);
+                        preferredNeighbour.getIsChoked().set(false);
                     }
-
                 }
             }
 
@@ -161,35 +148,32 @@ public class PeerHandler{
         public void run(){
             unchokeablePeersLock.lock();
 
-            try{
-                if(optUnchokeablePeers.size() != 0){
-                    Random rand = new Random();
-                    if(optimisticallyUnchokedNeighbour != null)
-                        optimisticallyUnchokedNeighbour.getIsOptimisticallyUnchoked().set(false);
+
+            if(optUnchokeablePeers.size() != 0){
+                Random rand = new Random();
+                if(optimisticallyUnchokedNeighbour != null)
+                    optimisticallyUnchokedNeighbour.getIsOptimisticallyUnchoked().set(false);
 
 
-                    //Randomly selecting optimisticUnchokedNeighbour
-                    optimisticallyUnchokedNeighbour = optUnchokeablePeers.get(rand.nextInt(optUnchokeablePeers.size()));
+                //Randomly selecting optimisticUnchokedNeighbour
+                optimisticallyUnchokedNeighbour = optUnchokeablePeers.get(rand.nextInt(optUnchokeablePeers.size()));
 
 
-                    if(!optimisticallyUnchokedNeighbour.getIsUnchoked().get()){
+                if(!optimisticallyUnchokedNeighbour.getIsUnchoked().get()){
 
 
-                        optimisticallyUnchokedNeighbour.getConnection().sendMessage(new Unchoke());
+                    optimisticallyUnchokedNeighbour.getConnection().sendMessage(new Unchoke());
 
-//                        System.out.println("SENDING UNCHOKE TO optimisticallyUnchokedNeighbour");
-                        optimisticallyUnchokedNeighbour.getIsOptimisticallyUnchoked().set(true);
-                        optimisticallyUnchokedNeighbour.getIsUnchoked().set(true);
-                        optimisticallyUnchokedNeighbour.getIsChoked().set(false);
-                    }
-
+//                  System.out.println("SENDING UNCHOKE TO optimisticallyUnchokedNeighbour");
+                    optimisticallyUnchokedNeighbour.getIsOptimisticallyUnchoked().set(true);
+                    optimisticallyUnchokedNeighbour.getIsUnchoked().set(true);
+                    optimisticallyUnchokedNeighbour.getIsChoked().set(false);
                 }
-            } catch (IOException e){
-                e.printStackTrace();
+
             }
-            finally {
-                unchokeablePeersLock.unlock();
-            }
+
+            unchokeablePeersLock.unlock();
+
         }
 
         
