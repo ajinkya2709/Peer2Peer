@@ -1,5 +1,4 @@
 package edu.ufl.cise.p2p.message;
-
 import java.util.BitSet;
 
 public class Bitfield extends Message {
