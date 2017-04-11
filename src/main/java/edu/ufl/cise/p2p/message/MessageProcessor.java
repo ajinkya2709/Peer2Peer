@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Random;
 
 import edu.ufl.cise.p2p.FileHandler;
+import edu.ufl.cise.p2p.Peer;
 import edu.ufl.cise.p2p.RemotePeer;
 import edu.ufl.cise.p2p.log.Log;
 
@@ -14,12 +15,14 @@ public class MessageProcessor {
 	boolean isChoked;
 	FileHandler fileHandler;
 	List<RemotePeer> remotePeers;
+	Peer locaPeer;
 
 	public MessageProcessor(FileHandler fileHandler,
-			List<RemotePeer> remotePeers) {
+			List<RemotePeer> remotePeers, Peer localPeer) {
 		isChoked = true;
 		this.fileHandler = fileHandler;
 		this.remotePeers = remotePeers;
+		this.locaPeer = localPeer;
 	}
 
 	public Message createResponse(Handshake handshake) {
@@ -103,7 +106,7 @@ public class MessageProcessor {
 			rPeer.getRequestedPieces().remove(pieceIndex);
 			System.out.println("Piece of index [" + piece.getIndex()
 					+ "] received from peer [" + rPeer.getPeerId() + "]");
-			System.out.println(new String(piece.getContent()));
+			//System.out.println(new String(piece.getContent()));
 			fileHandler.writePieceData(pieceIndex, piece.getContent());
 			fileHandler.getBitSet().set(pieceIndex);
 			rPeer.getBytesDownloaded().getAndAdd(piece.getContent().length);
@@ -135,8 +138,11 @@ public class MessageProcessor {
 				.nextSetBit(i + 1)) {
 			reqPieceIndices.add(i);
 		}
-		if (reqPieceIndices.isEmpty())
+		if (reqPieceIndices.isEmpty()) {
+			locaPeer.getHasFile().set(true);
 			return null;
+		}
+
 		Random r = new Random();
 		int randomListIndex = r.nextInt(reqPieceIndices.size());
 		System.out.println("Requesting piece index :"
