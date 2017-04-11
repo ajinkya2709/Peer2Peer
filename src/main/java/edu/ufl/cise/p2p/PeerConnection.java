@@ -9,6 +9,9 @@ import java.util.Map;
 import edu.ufl.cise.p2p.message.Handshake;
 import edu.ufl.cise.p2p.message.Message;
 import edu.ufl.cise.p2p.message.MessageProcessor;
+import edu.ufl.cise.p2p.log.Log;
+import edu.ufl.cise.p2p.log.Logfile;
+
 
 public class PeerConnection implements Runnable {
 
@@ -49,6 +52,7 @@ public class PeerConnection implements Runnable {
 				remotePeerId = String.valueOf(handShakeReceived.getPeerId());
 				remotePeerMap.get(remotePeerId).setConnection(this);
 			}
+			Log.logTCPConnection(localPeerId, remotePeerId);
 
 			MessageProcessor processor = new MessageProcessor(fileHandler);
 			Message response = processor.createResponse(handShakeReceived);
