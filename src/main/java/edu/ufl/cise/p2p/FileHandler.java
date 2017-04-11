@@ -1,5 +1,10 @@
 package edu.ufl.cise.p2p;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.BitSet;
 
 public class FileHandler {
@@ -9,6 +14,8 @@ public class FileHandler {
 	private int bitSetLength;
 	private String completeFilePath;
 	private BitSet bitSet;
+	private int totalParts;
+	private String partsDirectory = "\\parts";
 
 	public FileHandler(int pieceSize, int fileSize, String completeFilePath) {
 		this.pieceSize = pieceSize;
@@ -63,5 +70,125 @@ public class FileHandler {
 		for (int i = 0; i < bitSet.size(); i++)
 			bitSet.set(i);
 	}
+
+	public void splitFile(String fileName) {
+		File file = new File(fileName);
+		File filePartFolder = new File(file.getParent() + partsDirectory);
+		filePartFolder.mkdirs();
+		FileInputStream fis = null;
+		FileOutputStream fos = null;
+		String partName = null;
+		int totalFileSize = (int) file.length(), read = 0, chunkSize = pieceSize, partNumber = 0;
+		File filePart = null;
+		try {
+			fis = new FileInputStream(file);
+			while (totalFileSize > 0) {
+				if (totalFileSize < chunkSize)
+					chunkSize = totalFileSize;
+				byte[] bytes = new byte[chunkSize];
+				read = fis.read(bytes, 0, bytes.length);
+				System.out.println(new String(bytes));
+				totalFileSize -= read;
+				partNumber++;
+				partName = filePartFolder + "/" + "file.part"
+						+ String.valueOf(partNumber - 1);
+				filePart = new File(partName);
+				if (!filePart.exists()) {
+					filePart.createNewFile();
+				}
+				fos = new FileOutputStream(filePart);
+				fos.write(bytes);
+				fos.flush();
+				fos.close();
+				fos = null;
+				bytes = null;
+			}
+			fis.close();
+			totalParts = partNumber;
+			System.out.println("Total Parts :" + totalParts);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	public void mergeFilesInto(String fileName, int parts) {
+		FileInputStream fis = null;
+		FileOutputStream fos = null;
+		String partName = null;
+		byte[] bytes = null;
+		try {
+			File original = new File(fileName);
+			original.createNewFile();
+			File filePart = null;
+			fos = new FileOutputStream(original, true);
+			// change needed to use totalParts variable
+			System.out.println("total parts :" + parts);
+			for (int i = 0; i < parts; i++) {
+				partName = original.getParent() + "/part/" + "file.part"
+						+ String.valueOf(i);
+				filePart = new File(partName);
+				System.out.println(filePart.getAbsolutePath() + "  "
+						+ filePart.exists());
+				fis = new FileInputStream(filePart);
+				bytes = new byte[(int) filePart.length()];
+				fis.read(bytes, 0, (int) filePart.length());
+				System.out.println(new String(bytes));
+				fos.write(bytes);
+				fos.flush();
+				bytes = null;
+				fis.close();
+				fis = null;
+			}
+			fos.close();
+			fos = null;
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+	
+	public byte[] getDataFromPiece(int index){
+		FileInputStream fis = null;
+		String partName = null;
+		File filePart = null;
+		
+		File original = new File(completeFilePath);
+		partName = original.getParent() + "/part/" + "file.part"
+				+ String.valueOf(index);
+		filePart = new File(partName);
+		byte[] bytes = null;
+		if(!filePart.exists()) return null;
+		try {
+			fis = new FileInputStream(filePart);
+			bytes = new byte[(int) filePart.length()];
+			fis.read(bytes, 0, (int) filePart.length());
+			fis.close();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return bytes;
+	}
+	
+
+	/*
+	 * public static void main(String[] args) { String completeFilePath =
+	 * "C:\\Users\\ajinkya\\Desktop\\split\\sample.txt"; FileHandler fh = new
+	 * FileHandler(5, 1000, completeFilePath); fh.splitFile(completeFilePath);
+	 * 
+	 * fh.mergeFilesInto(completeFilePath, 88); }
+	 */
 
 }
