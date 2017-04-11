@@ -31,7 +31,8 @@ public class MessageProcessor {
 		switch (type) {
 		case 0:
 			Log.logChoking(rPeer.getPeerId());
-			System.out.println("Received CHOKE from peer :" + rPeer.getPeerId());
+			System.out
+					.println("Received CHOKE from peer :" + rPeer.getPeerId());
 			isChoked = true;
 			break;
 		case 1:
@@ -40,7 +41,7 @@ public class MessageProcessor {
 					+ rPeer.getPeerId());
 			isChoked = false;
 			return getRandomPieceIndex(rPeer);
-			
+
 		case 2:
 			Log.logReceivedInterested(rPeer.getPeerId());
 			System.out.println("Received INTERESTED from peer :"
@@ -85,11 +86,18 @@ public class MessageProcessor {
 			}
 		case 6:
 			Request request = (Request) message;
-			request.getPieceIndex();
-			System.out.println("Index :" + request.getPieceIndex()
+			int indexOfPieceRequested = request.getPieceIndex();
+			System.out.println("Index :" + indexOfPieceRequested
 					+ " requested by peer [" + rPeer.getPeerId() + "]");
+			new Piece(indexOfPieceRequested,
+					fileHandler.getDataFromPiece(indexOfPieceRequested));
 			break;
 		case 7:
+			Piece piece = (Piece) message;
+			System.out.println("Piece received from peer [" + rPeer.getPeerId()
+					+ "]");
+			System.out.println("Piece index [" + piece.getIndex()
+					+ new String(piece.getContent()));
 			break;
 		}
 		return null;
@@ -106,7 +114,8 @@ public class MessageProcessor {
 			return null;
 		Random r = new Random();
 		int randomListIndex = r.nextInt(neededPieceIndices.size());
-		System.out.println("Requesting piece index :"+neededPieceIndices.get(randomListIndex));
+		System.out.println("Requesting piece index :"
+				+ neededPieceIndices.get(randomListIndex));
 		return new Request(neededPieceIndices.get(randomListIndex));
 	}
 
