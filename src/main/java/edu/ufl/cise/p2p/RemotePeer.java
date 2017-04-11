@@ -1,6 +1,8 @@
 package edu.ufl.cise.p2p;
 
 import java.util.BitSet;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -20,6 +22,7 @@ public class RemotePeer {
 	private AtomicBoolean isUnchoked;
 	private AtomicBoolean isPreferredNeighbor;
 	private AtomicBoolean isOptimisticallyUnchoked;
+	private Set<Integer> requestedPieces;
 
 	public RemotePeer(String ipAddress, int port, String peerId, Boolean hasFile) {
 		this.ipAddress = ipAddress;
@@ -32,6 +35,7 @@ public class RemotePeer {
 		this.isUnchoked = new AtomicBoolean(false);
 		this.isPreferredNeighbor = new AtomicBoolean(false);
 		this.isOptimisticallyUnchoked = new AtomicBoolean(false);
+		this.requestedPieces = new HashSet<Integer>();
 	}
 
 	public String getIpAddress() {
@@ -129,6 +133,14 @@ public class RemotePeer {
 	public void setIsOptimisticallyUnchoked(
 			AtomicBoolean isOptimisticallyUnchoked) {
 		this.isOptimisticallyUnchoked = isOptimisticallyUnchoked;
+	}
+
+	public Set<Integer> getRequestedPieces() {
+		return requestedPieces;
+	}
+
+	public void setRequestedPieces(Set<Integer> requestedPieces) {
+		this.requestedPieces = requestedPieces;
 	}
 
 }
