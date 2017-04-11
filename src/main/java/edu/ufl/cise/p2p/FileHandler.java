@@ -87,7 +87,7 @@ public class FileHandler {
 					chunkSize = totalFileSize;
 				byte[] bytes = new byte[chunkSize];
 				read = fis.read(bytes, 0, bytes.length);
-				//System.out.println(new String(bytes));
+				// System.out.println(new String(bytes));
 				totalFileSize -= read;
 				partNumber++;
 				partName = filePartFolder + "/" + "file.part"
@@ -128,8 +128,8 @@ public class FileHandler {
 			// change needed to use totalParts variable
 			System.out.println("total parts :" + parts);
 			for (int i = 0; i < parts; i++) {
-				partName = original.getParent() + "/"+partsDirectory +"/" + "file.part"
-						+ String.valueOf(i);
+				partName = original.getParent() + "/" + partsDirectory + "/"
+						+ "file.part" + String.valueOf(i);
 				filePart = new File(partName);
 				System.out.println(filePart.getAbsolutePath() + "  "
 						+ filePart.exists());
@@ -154,18 +154,19 @@ public class FileHandler {
 		}
 
 	}
-	
-	public byte[] getDataFromPiece(int index){
+
+	public byte[] getDataFromPiece(int index) {
 		FileInputStream fis = null;
 		String partName = null;
 		File filePart = null;
-		
+
 		File original = new File(completeFilePath);
-		partName = original.getParent() + "/parts/" + "file.part"
-				+ String.valueOf(index);
+		partName = original.getParent() + "/" + partsDirectory + "/"
+				+ "file.part" + String.valueOf(index);
 		filePart = new File(partName);
 		byte[] bytes = null;
-		if(!filePart.exists()) return null;
+		if (!filePart.exists())
+			return null;
 		try {
 			fis = new FileInputStream(filePart);
 			bytes = new byte[(int) filePart.length()];
@@ -178,10 +179,30 @@ public class FileHandler {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		return bytes;
 	}
-	
+
+	public void writePieceData(int index, byte[] data) {
+		File file = new File(completeFilePath);
+		File filePartFolder = new File(file.getParent() + "/" + partsDirectory);
+		filePartFolder.mkdirs();
+		FileOutputStream fos = null;
+
+		try {
+			File part = new File(file.getParent() + "/" + partsDirectory + "/"
+					+ "file.part" + String.valueOf(index));
+			part.createNewFile();
+			fos = new FileOutputStream(part);
+			fos.write(data, 0, data.length);
+			fos.flush();
+			fos.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
 
 	/*
 	 * public static void main(String[] args) { String completeFilePath =
