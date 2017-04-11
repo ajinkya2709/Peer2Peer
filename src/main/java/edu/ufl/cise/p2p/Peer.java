@@ -26,8 +26,11 @@ public class Peer implements Runnable {
 
 	public void init() {
 		peerHandler.sendChokeAndUnchokeMessages();
-		if (hasFile)
+		if (hasFile){
+			fileHandler.splitFile(commonProps.getFileName());
 			fileHandler.setAllPieces();
+		}
+			
 	}
 
 	public Peer(String id, String host, int port, Boolean hasFile,
