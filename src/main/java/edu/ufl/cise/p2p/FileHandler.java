@@ -15,7 +15,7 @@ public class FileHandler {
 	private String completeFilePath;
 	private BitSet bitSet;
 	private int totalParts;
-	private String partsDirectory = "\\parts";
+	private String partsDirectory = "parts";
 
 	public FileHandler(int pieceSize, int fileSize, String completeFilePath) {
 		this.pieceSize = pieceSize;
@@ -73,7 +73,7 @@ public class FileHandler {
 
 	public void splitFile(String fileName) {
 		File file = new File(fileName);
-		File filePartFolder = new File(file.getParent() + partsDirectory);
+		File filePartFolder = new File(file.getParent() + "/" + partsDirectory);
 		filePartFolder.mkdirs();
 		FileInputStream fis = null;
 		FileOutputStream fos = null;
@@ -87,7 +87,7 @@ public class FileHandler {
 					chunkSize = totalFileSize;
 				byte[] bytes = new byte[chunkSize];
 				read = fis.read(bytes, 0, bytes.length);
-				System.out.println(new String(bytes));
+				//System.out.println(new String(bytes));
 				totalFileSize -= read;
 				partNumber++;
 				partName = filePartFolder + "/" + "file.part"
@@ -128,7 +128,7 @@ public class FileHandler {
 			// change needed to use totalParts variable
 			System.out.println("total parts :" + parts);
 			for (int i = 0; i < parts; i++) {
-				partName = original.getParent() + "/part/" + "file.part"
+				partName = original.getParent() + "/"+partsDirectory +"/" + "file.part"
 						+ String.valueOf(i);
 				filePart = new File(partName);
 				System.out.println(filePart.getAbsolutePath() + "  "
@@ -161,7 +161,7 @@ public class FileHandler {
 		File filePart = null;
 		
 		File original = new File(completeFilePath);
-		partName = original.getParent() + "/part/" + "file.part"
+		partName = original.getParent() + "/parts/" + "file.part"
 				+ String.valueOf(index);
 		filePart = new File(partName);
 		byte[] bytes = null;
