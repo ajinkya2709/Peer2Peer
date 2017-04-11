@@ -105,7 +105,7 @@ public class MessageProcessor {
 			fileHandler.getBitSet().set(pieceIndex);
 			rPeer.getBytesDownloaded().getAndAdd(piece.getContent().length);
 			if (fileHandler.getNeededPieces().isEmpty()) {
-				fileHandler.mergeFilesInto(fileHandler.getBitSet().size());
+				fileHandler.mergeFilesInto(fileHandler.getBitSetLength());
 				break;
 			}
 			if (!isChoked)
