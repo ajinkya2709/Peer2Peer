@@ -1,5 +1,6 @@
 package edu.ufl.cise.p2p.message;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
@@ -9,6 +10,7 @@ import edu.ufl.cise.p2p.FileHandler;
 import edu.ufl.cise.p2p.Peer;
 import edu.ufl.cise.p2p.RemotePeer;
 import edu.ufl.cise.p2p.log.Log;
+import edu.ufl.cise.p2p.log.Logfile;
 
 public class MessageProcessor {
 
@@ -16,13 +18,15 @@ public class MessageProcessor {
 	FileHandler fileHandler;
 	List<RemotePeer> remotePeers;
 	Peer locaPeer;
+	Logfile log;
 
 	public MessageProcessor(FileHandler fileHandler,
-			List<RemotePeer> remotePeers, Peer localPeer) {
+			List<RemotePeer> remotePeers, Peer localPeer) throws IOException {
 		isChoked = true;
 		this.fileHandler = fileHandler;
 		this.remotePeers = remotePeers;
 		this.locaPeer = localPeer;
+		this.log=new Logfile(localPeer.getId());
 	}
 
 	public Message createResponse(Handshake handshake) {
@@ -36,7 +40,7 @@ public class MessageProcessor {
 		int type = message.getType();
 		switch (type) {
 		case 0:
-			Log.logChoking(rPeer.getPeerId());
+			log.logChoking(rPeer.getPeerId());
 			System.out
 					.println("Received CHOKE from peer :" + rPeer.getPeerId());
 			isChoked = true;
@@ -44,14 +48,14 @@ public class MessageProcessor {
 			rPeer.getRequestedPieces().clear();
 			break;
 		case 1:
-			Log.logUnchoking(rPeer.getPeerId());
+			log.logUnchoking(rPeer.getPeerId());
 			System.out.println("Received UNCHOKE from peer :"
 					+ rPeer.getPeerId());
 			isChoked = false;
 			return getRequestMessage(rPeer);
 
 		case 2:
-			Log.logReceivedInterested(rPeer.getPeerId());
+			log.logReceivedInterested(rPeer.getPeerId());
 			System.out.println("Received INTERESTED from peer :"
 					+ rPeer.getPeerId());
 			System.out.println("Marking [" + rPeer.getPeerId()
@@ -59,7 +63,7 @@ public class MessageProcessor {
 			rPeer.getIsInterested().set(true);
 			break;
 		case 3:
-			Log.logReceivedNotInterested(rPeer.getPeerId());
+			log.logReceivedNotInterested(rPeer.getPeerId());
 			System.out.println("Received NOT INTERESTED from peer :"
 					+ rPeer.getPeerId());
 			System.out.println("Marking [" + rPeer.getPeerId()
@@ -70,7 +74,7 @@ public class MessageProcessor {
 			System.out.println("Received HAVE from peer :" + rPeer.getPeerId());
 			Have have = (Have) message;
 			int index = have.getIndex();
-			Log.logReceivedHave(rPeer.getPeerId(), have.getIndex());
+			log.logReceivedHave(rPeer.getPeerId(), have.getIndex());
 			rPeer.getBitSet().set(index);
 			if (fileHandler.getBitSet().get(index)) {
 				System.out.println("Peer already has part of index: " + index

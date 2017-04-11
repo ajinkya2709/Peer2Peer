@@ -1,5 +1,6 @@
 package edu.ufl.cise.p2p;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -11,6 +12,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
+import edu.ufl.cise.p2p.log.Logfile;
 import edu.ufl.cise.p2p.message.Choke;
 import edu.ufl.cise.p2p.message.Unchoke;
 
@@ -20,7 +22,7 @@ public class PeerHandler{
     OptimisticallyUnchokedNeighbour optimisticallyUnchokedTask;
     CommonPeerProperties commonProp;
 
-    public PeerHandler(ArrayList<RemotePeer> peers, CommonPeerProperties prop, Peer localPeer, int peerId){
+    public PeerHandler(ArrayList<RemotePeer> peers, CommonPeerProperties prop, Peer localPeer, int peerId) throws IOException{
 
         optimisticallyUnchokedTask = new OptimisticallyUnchokedNeighbour(prop,peerId);
         preferredNeighboursTask = new PreferredNeighbours(peers, prop, localPeer, optimisticallyUnchokedTask,peerId);
@@ -52,10 +54,11 @@ public class PeerHandler{
         OptimisticallyUnchokedNeighbour optUnchokedScheduler;
         ArrayList<RemotePeer> optUnchokedNeighbours;
         int localPeerId;
+        Logfile log;
 
         public PreferredNeighbours(ArrayList<RemotePeer> peers, CommonPeerProperties prop,
                                    Peer localPeer,
-                                   OptimisticallyUnchokedNeighbour optUnchokedScheduler,int peerId){
+                                   OptimisticallyUnchokedNeighbour optUnchokedScheduler,int peerId) throws IOException{
             remotePeers = peers;
             commonProp = prop;
             this.hasFile = localPeer.getHasFile();
@@ -63,6 +66,8 @@ public class PeerHandler{
             preferredNeighbours = new ArrayList<RemotePeer>();
             optUnchokedNeighbours = new ArrayList<RemotePeer>();
             localPeerId = peerId;
+         
+            log = new Logfile(Integer.toString(peerId));
         }
 
         public void run(){
@@ -87,6 +92,7 @@ public class PeerHandler{
                 clearPreviousPreferredNeighbours(); //clearing previous preferredNeighbours from the list
                 preferredNeighbours.addAll(interestedPeers.subList(0,
                         Math.min(commonProp.getNumberOfPreferredNeighbors(),interestedPeers.size())));  //updating preferredNeighbours
+                log.logChangePreferredNeighbors(preferredNeighbours);
 
                 LinkedList<RemotePeer> chokedPeers = new LinkedList<RemotePeer>(remotePeers);
                 chokedPeers.removeAll(preferredNeighbours);
@@ -139,14 +145,16 @@ public class PeerHandler{
         CommonPeerProperties commonProp;
         RemotePeer optimisticallyUnchokedNeighbour;
         int localPeerId;
+        Logfile log;
 
         public final ReentrantLock unchokeablePeersLock;
 
-        public OptimisticallyUnchokedNeighbour(CommonPeerProperties prop,int peerId){
+        public OptimisticallyUnchokedNeighbour(CommonPeerProperties prop,int peerId) throws IOException{
             commonProp = prop;
             unchokeablePeersLock = new ReentrantLock();
             optUnchokeablePeers = new ArrayList<RemotePeer>();
             localPeerId = peerId;
+            log = new Logfile(Integer.toString(peerId));
         }
         public void run(){
             unchokeablePeersLock.lock();
@@ -160,6 +168,7 @@ public class PeerHandler{
 
                 //Randomly selecting optimisticUnchokedNeighbour
                 optimisticallyUnchokedNeighbour = optUnchokeablePeers.get(rand.nextInt(optUnchokeablePeers.size()));
+                log.logChangeOptimisticallyUnchokedNeighbor(optimisticallyUnchokedNeighbour.getPeerId());
 
 
                 if(!optimisticallyUnchokedNeighbour.getIsUnchoked().get()){

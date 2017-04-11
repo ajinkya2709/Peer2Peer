@@ -86,38 +86,5 @@ public class Log
 		Date date = new Date();
 		this.time.setTime(date.getTime());
 		return time.toString();
-	} /* end getTime method */
-	public static void logTCPConnection(String localPeerId, String remotePeerId)
-	{
-		System.out.println("Connection created between :" + localPeerId
-				+ "\tand:" + remotePeerId);
-	} /* end logTCPConnection method */
-
-	public static void logUnchoking(String peerId) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public static void logReceivedInterested(String peerId) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public static void logReceivedNotInterested(String peerId) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public static void logReceivedHave(String string, int index) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public static void logChoking(String peerId) {
-		// TODO Auto-generated method stub
-		
-	}
-	
+	} /* end getTime method */	
 } /* end Log class */
-
-

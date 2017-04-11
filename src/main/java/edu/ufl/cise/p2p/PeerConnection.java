@@ -6,8 +6,7 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Map;
-
-import edu.ufl.cise.p2p.log.Log;
+import edu.ufl.cise.p2p.log.Logfile;
 import edu.ufl.cise.p2p.message.Handshake;
 import edu.ufl.cise.p2p.message.Message;
 import edu.ufl.cise.p2p.message.MessageProcessor;
@@ -23,6 +22,7 @@ public class PeerConnection implements Runnable {
 	FileHandler fileHandler;
 	Map<String, RemotePeer> remotePeerMap;
 	Peer localPeer;
+	Logfile log;
 
 	public PeerConnection(Socket socket, String localPeerId, String remotePeer,
 			boolean isClient, FileHandler fileHandler,
@@ -38,7 +38,7 @@ public class PeerConnection implements Runnable {
 		this.fileHandler = fileHandler;
 		this.remotePeerMap = remotePeerMap;
 		this.localPeer = peer;
-	}
+		this.log=new Logfile(localPeerId);	}
 
 	public void run() {
 		System.out.println("Connection created between :" + localPeerId
@@ -54,7 +54,7 @@ public class PeerConnection implements Runnable {
 				remotePeerId = String.valueOf(handShakeReceived.getPeerId());
 				remotePeerMap.get(remotePeerId).setConnection(this);
 			}
-			Log.logTCPConnection(localPeerId, remotePeerId);
+			log.logTCPConnection(localPeerId, remotePeerId);
 
 			MessageProcessor processor = new MessageProcessor(fileHandler,
 					new ArrayList<RemotePeer>(remotePeerMap.values()),localPeer);

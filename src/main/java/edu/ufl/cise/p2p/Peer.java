@@ -37,7 +37,7 @@ public class Peer implements Runnable {
 	}
 
 	public Peer(String id, String host, int port, Boolean hasFile,
-			List<RemotePeer> remotePeers, CommonPeerProperties commonProps) {
+			List<RemotePeer> remotePeers, CommonPeerProperties commonProps) throws NumberFormatException, IOException {
 		this.id = id;
 		this.host = host;
 		this.port = port;
