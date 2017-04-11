@@ -1,15 +1,18 @@
 package edu.ufl.cise.p2p;
 
-import edu.ufl.cise.p2p.message.Choke;
-import edu.ufl.cise.p2p.message.Unchoke;
-
-import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
+
+import edu.ufl.cise.p2p.message.Choke;
+import edu.ufl.cise.p2p.message.Unchoke;
 
 public class PeerHandler{
 
