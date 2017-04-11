@@ -110,7 +110,7 @@ public class MessageProcessor {
 			for (RemotePeer remote : remotePeers) {
 				if (remote.getConnection() == null)
 					continue;
-				if (!rPeer.getBitSet().get(pieceIndex)) {
+				if (!remote.getBitSet().get(pieceIndex)) {
 					System.out.println("Sending HAVE Message to ["
 							+ remote.getPeerId() + "]");
 					remote.getConnection().sendMessage(new Have(pieceIndex));
