@@ -29,13 +29,13 @@ public class Log
 		
 		/* Create the file and overwrite existing file */
 		file = new File(path);
-		if(file.exists()) file.delete();
+		//if(file.exists()) file.append();
 		file.createNewFile();
 		
 		/* Create the streams */
 		try 
 		{
-			fw = new FileWriter(file.getAbsoluteFile());
+			fw = new FileWriter(file.getAbsoluteFile(), true);
 			bw = new BufferedWriter(fw);
 		} /* remove try */
 		catch (IOException e) 

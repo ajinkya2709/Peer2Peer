@@ -51,7 +51,7 @@ public class Logfile extends Log
 		String event;
 		//if(remotePeerId)
 	//	{/* This Peer made the connection */
-			event = peerconnection() + " makes a connection to Peer " + localPeerId + ". \n";
+			event = peerconnection() + " makes a connection to Peer " + remotePeerId + ". \n";
 		//} /* end if */
 		//else
 		//{ //* This Peer was connected to by peer */

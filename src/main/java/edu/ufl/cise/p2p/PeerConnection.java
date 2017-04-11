@@ -46,6 +46,7 @@ public class PeerConnection implements Runnable {
 		try {
 			outStream.writeObject(new Handshake(Integer.parseInt(localPeerId)));
 			Handshake handShakeReceived = (Handshake) inStream.readObject();
+			log.logTCPConnection(localPeerId, remotePeerId);
 			System.out.println("Peer :[" + localPeerId
 					+ "] received Handshake from Peer :["
 					+ handShakeReceived.getPeerId() + "]");
@@ -54,7 +55,6 @@ public class PeerConnection implements Runnable {
 				remotePeerId = String.valueOf(handShakeReceived.getPeerId());
 				remotePeerMap.get(remotePeerId).setConnection(this);
 			}
-			log.logTCPConnection(localPeerId, remotePeerId);
 
 			MessageProcessor processor = new MessageProcessor(fileHandler,
 					new ArrayList<RemotePeer>(remotePeerMap.values()),localPeer);
