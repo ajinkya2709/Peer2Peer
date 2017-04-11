@@ -93,11 +93,14 @@ public class MessageProcessor {
 			return new Piece(indexOfPieceRequested, data);
 		case 7:
 			Piece piece = (Piece) message;
-			System.out.println("Piece received from peer [" + rPeer.getPeerId()
-					+ "]");
-			System.out.println("Piece index [" + piece.getIndex()
-					+ new String(piece.getContent()));
-			break;
+			int pieceIndex = piece.getIndex();
+			System.out.println("Piece of index [" + piece.getIndex()
+					+ "] received from peer [" + rPeer.getPeerId() + "]");
+			System.out.println(new String(piece.getContent()));
+			fileHandler.writePieceData(pieceIndex, piece.getContent());
+			fileHandler.getBitSet().set(pieceIndex);
+			if (!isChoked)
+				return getRandomPieceIndex(rPeer);
 		}
 		return null;
 	}
