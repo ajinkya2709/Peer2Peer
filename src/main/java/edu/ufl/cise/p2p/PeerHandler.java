@@ -17,10 +17,10 @@ public class PeerHandler{
     OptimisticallyUnchokedNeighbour optimisticallyUnchokedTask;
     CommonPeerProperties commonProp;
 
-    public PeerHandler(ArrayList<RemotePeer> peers, CommonPeerProperties prop, Boolean hasFile){
+    public PeerHandler(ArrayList<RemotePeer> peers, CommonPeerProperties prop, Boolean hasFile, int peerId){
 
-        optimisticallyUnchokedTask = new OptimisticallyUnchokedNeighbour(prop);
-        preferredNeighboursTask = new PreferredNeighbours(peers, prop, hasFile, optimisticallyUnchokedTask);
+        optimisticallyUnchokedTask = new OptimisticallyUnchokedNeighbour(prop,peerId);
+        preferredNeighboursTask = new PreferredNeighbours(peers, prop, hasFile, optimisticallyUnchokedTask,peerId);
         commonProp = prop;
 
     }
@@ -48,15 +48,18 @@ public class PeerHandler{
         ArrayList<RemotePeer> preferredNeighbours;
         OptimisticallyUnchokedNeighbour optUnchokedScheduler;
         ArrayList<RemotePeer> optUnchokedNeighbours;
+        int localPeerId;
 
         public PreferredNeighbours(ArrayList<RemotePeer> peers, CommonPeerProperties prop,
-                                   Boolean hasFile, OptimisticallyUnchokedNeighbour optUnchokedScheduler){
+                                   Boolean hasFile,
+                                   OptimisticallyUnchokedNeighbour optUnchokedScheduler,int peerId){
             remotePeers = peers;
             commonProp = prop;
             this.hasFile.set(hasFile);
             this.optUnchokedScheduler = optUnchokedScheduler;
             preferredNeighbours = new ArrayList<RemotePeer>();
             optUnchokedNeighbours = new ArrayList<RemotePeer>();
+            localPeerId = peerId;
         }
 
         public void run(){
@@ -93,7 +96,7 @@ public class PeerHandler{
                 for(RemotePeer chokedPeer: chokedPeers){
 
                     try {
-                        if(!chokedPeer.getIsChoked().get()){
+                        if(!chokedPeer.getIsChoked().get() && chokedPeer.getConnection() != null){
                             chokedPeer.getConnection().sendMessage(new Choke());
                             chokedPeer.getIsChoked().set(true);
                             chokedPeer.getIsUnchoked().set(false);
@@ -145,11 +148,15 @@ public class PeerHandler{
         ArrayList<RemotePeer> optUnchokeablePeers;
         CommonPeerProperties commonProp;
         RemotePeer optimisticallyUnchokedNeighbour;
+        int localPeerId;
+
         public final ReentrantLock unchokeablePeersLock;
 
-        public OptimisticallyUnchokedNeighbour(CommonPeerProperties prop){
+        public OptimisticallyUnchokedNeighbour(CommonPeerProperties prop,int peerId){
             commonProp = prop;
             unchokeablePeersLock = new ReentrantLock();
+            optUnchokeablePeers = new ArrayList<RemotePeer>();
+            localPeerId = peerId;
         }
         public void run(){
             unchokeablePeersLock.lock();
@@ -170,6 +177,7 @@ public class PeerHandler{
 
                         optimisticallyUnchokedNeighbour.getConnection().sendMessage(new Unchoke());
 
+//                        System.out.println("SENDING UNCHOKE TO optimisticallyUnchokedNeighbour");
                         optimisticallyUnchokedNeighbour.getIsOptimisticallyUnchoked().set(true);
                         optimisticallyUnchokedNeighbour.getIsUnchoked().set(true);
                         optimisticallyUnchokedNeighbour.getIsChoked().set(false);
