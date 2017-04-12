@@ -23,6 +23,7 @@ public class RemotePeer {
 	private AtomicBoolean isPreferredNeighbor;
 	private AtomicBoolean isOptimisticallyUnchoked;
 	private Set<Integer> requestedPieces;
+	private AtomicBoolean isTerminated;
 
 	public RemotePeer(String ipAddress, int port, String peerId, Boolean hasFile) {
 		this.ipAddress = ipAddress;
@@ -37,6 +38,7 @@ public class RemotePeer {
 		this.isOptimisticallyUnchoked = new AtomicBoolean(false);
 		this.requestedPieces = new HashSet<Integer>();
 		this.bitSet = new BitSet(0);
+		this.isTerminated = new AtomicBoolean(false);
 	}
 
 	public String getIpAddress() {
@@ -142,6 +144,14 @@ public class RemotePeer {
 
 	public void setRequestedPieces(Set<Integer> requestedPieces) {
 		this.requestedPieces = requestedPieces;
+	}
+
+	public AtomicBoolean getIsTerminated() {
+		return isTerminated;
+	}
+
+	public void setIsTerminated(AtomicBoolean isTerminated) {
+		this.isTerminated = isTerminated;
 	}
 
 }
