@@ -34,7 +34,7 @@ public class Logfile extends Log
 	 * Returns a string of the form [Time]: Peer [peer_ID]
 	 * @return	a string of the form [Time]: Peer [peer_ID]
 	 */
-	private String peerconnection()
+	private String peerConnection()
 	{
 		return(this.getTime() + ": Peer " + this.peerID);
 	} /* end peerconnection */
@@ -51,11 +51,11 @@ public class Logfile extends Log
 		String event;
 		//if(remotePeerId)
 	//	{/* This Peer made the connection */
-			event = peerconnection() + " makes a connection to Peer " + remotePeerId + ". \n";
+			event = peerConnection() + " makes a connection to Peer " + remotePeerId + ". \n";
 		//} /* end if */
 		//else
 		//{ //* This Peer was connected to by peer */
-		//	event = peerconnection() + " is connected from Peer " + localPeerId + ". \n";
+		  //  event = peerConnection() + " is connected from Peer " + localPeerId + ". \n";
 		//} /* end else */
 		
 		this.writeToFile(event);
@@ -69,7 +69,7 @@ public class Logfile extends Log
 	public void logChangePreferredNeighbors(ArrayList<RemotePeer> preferredNeighbours)
 	{
 		StringBuffer event = new StringBuffer();
-		event.append(peerconnection() + " has the preferred neighbors ");
+		event.append(peerConnection() + " has the preferred neighbors ");
 		
 		/* Append the neighbors */
 		for(int i = 0; i < (preferredNeighbours.size() - 1); i++)
@@ -89,7 +89,7 @@ public class Logfile extends Log
 	 */
 	public void logChangeOptimisticallyUnchokedNeighbor(String string)
 	{
-		String event = peerconnection() + " has the optimistically-unchoked neighbor " + string + ". \n";
+		String event = peerConnection() + " has the optimistically-unchoked neighbor " + string + ". \n";
 		this.writeToFile(event);
 	} /* end logChangeOptimisticallyUnchokedNeighbor method */
 	
@@ -99,7 +99,7 @@ public class Logfile extends Log
 	 */
 	public void logUnchoking(String string)
 	{
-		String event = peerconnection() + " is unchoked by " + string + ". \n";
+		String event = peerConnection() + " is unchoked by " + string + ". \n";
 		this.writeToFile(event);
 	} /* end logUnchoking method */
 	
@@ -109,7 +109,7 @@ public class Logfile extends Log
 	 */
 	public void logChoking(String string)
 	{
-		String event = peerconnection() + " is choked by " + string + ". \n";
+		String event = peerConnection() + " is choked by " + string + ". \n";
 		this.writeToFile(event);
 	} /* end logChoking method */
 	
@@ -120,7 +120,7 @@ public class Logfile extends Log
 	 */
 	public void logReceivedHave(String string, int index)
 	{
-		String event = peerconnection() + " received a 'have' message from " + string + " for the piece " + index + ". \n";
+		String event = peerConnection() + " received a 'have' message from " + string + " for the piece " + index + ". \n";
 		this.writeToFile(event);
 	} /* end logReceivedHave method */
 	
@@ -130,7 +130,7 @@ public class Logfile extends Log
 	 */
 	public void logReceivedInterested(String string)
 	{
-		String event = peerconnection() + " received an 'interested' message from " + string + ". \n";
+		String event = peerConnection() + " received an 'interested' message from " + string + ". \n";
 		this.writeToFile(event);
 	} /* end logReceivedInterested method */
 	
@@ -140,7 +140,7 @@ public class Logfile extends Log
 	 */
 	public void logReceivedNotInterested(String string)
 	{
-		String event = peerconnection() + " received a 'not interested' message from " + string + ". \n";
+		String event = peerConnection() + " received a 'not interested' message from " + string + ". \n";
 		this.writeToFile(event);
 	} /* end logReceivedNotInterested method */
 
@@ -152,7 +152,7 @@ public class Logfile extends Log
 	 */
 	public void logDownloadingPiece(int peer, int index, int has)
 	{
-		String event = peerconnection() + " has downloaded the piece " + index + " from " + peer + ". \nNow the number of pieces it has is " + has + ".\n";
+		String event = peerConnection() + " has downloaded the piece " + index + " from " + peer + ". \nNow the number of pieces it has is " + has + ".\n";
 		this.writeToFile(event);
 	} /* end logDownloadingPiece method */
 	
@@ -161,7 +161,7 @@ public class Logfile extends Log
 	 */
 	public void logCompletion()
 	{
-		String event = peerconnection() + " has downloaded the complete file.\n";
+		String event = peerConnection() + " has downloaded the complete file.\n";
 		this.writeToFile(event);
 	} /* end logCompletion method */
 	
