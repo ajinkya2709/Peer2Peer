@@ -81,7 +81,7 @@ public class FileHandler {
 
 	public void setAllPieces() {
 		// System.out.println("Size of bitset is:" + bitSet.size());
-		for (int i = 0; i < bitSet.size(); i++)
+		for (int i = 0; i < bitSetLength; i++)
 			bitSet.set(i);
 	}
 
