@@ -9,7 +9,6 @@ import java.util.Random;
 import edu.ufl.cise.p2p.FileHandler;
 import edu.ufl.cise.p2p.Peer;
 import edu.ufl.cise.p2p.RemotePeer;
-import edu.ufl.cise.p2p.log.Log;
 import edu.ufl.cise.p2p.log.Logfile;
 
 public class MessageProcessor {
@@ -26,7 +25,7 @@ public class MessageProcessor {
 		this.fileHandler = fileHandler;
 		this.remotePeers = remotePeers;
 		this.locaPeer = localPeer;
-		this.log=new Logfile(localPeer.getId());
+		this.log = new Logfile(localPeer.getId());
 	}
 
 	public Message createResponse(Handshake handshake) {
@@ -108,13 +107,15 @@ public class MessageProcessor {
 			Piece piece = (Piece) message;
 			int pieceIndex = piece.getIndex();
 			rPeer.getRequestedPieces().remove(pieceIndex);
+			fileHandler.getRequestedPieces().decrementAndGet();
 			System.out.println("Piece of index [" + piece.getIndex()
 					+ "] received from peer [" + rPeer.getPeerId() + "]");
-			//System.out.println(new String(piece.getContent()));
+			// System.out.println(new String(piece.getContent()));
 			fileHandler.writePieceData(pieceIndex, piece.getContent());
 			fileHandler.getBitSet().set(pieceIndex);
 			rPeer.getBytesDownloaded().getAndAdd(piece.getContent().length);
-			int totalPiecesDownloaded = fileHandler.getTotalParts() - fileHandler.getNeededPieces().size();
+			int totalPiecesDownloaded = fileHandler.getBitSetLength()
+					- fileHandler.getNeededPieces().size();
 			for (RemotePeer remote : remotePeers) {
 				if (remote.getConnection() == null)
 					continue;
@@ -125,8 +126,10 @@ public class MessageProcessor {
 				}
 				totalPiecesDownloaded -= remote.getRequestedPieces().size();
 			}
-			log.logDownloadingPiece(rPeer.getPeerId(), pieceIndex, totalPiecesDownloaded);
-			if (fileHandler.getNeededPieces().isEmpty()) {
+			log.logDownloadingPiece(rPeer.getPeerId(), pieceIndex,
+					totalPiecesDownloaded);
+			if (fileHandler.getNeededPieces().isEmpty()
+					&& fileHandler.getRequestedPieces().get() == 0) {
 				fileHandler.mergeFilesInto(fileHandler.getBitSetLength());
 				log.logCompletion();
 				break;
@@ -138,6 +141,7 @@ public class MessageProcessor {
 	}
 
 	private Message getRequestMessage(RemotePeer rPeer) {
+		fileHandler.getRequestedPieces().incrementAndGet();
 		BitSet copy = (BitSet) rPeer.getBitSet().clone();
 		copy.andNot(fileHandler.getBitSet());
 		List<Integer> reqPieceIndices = new ArrayList<Integer>();
