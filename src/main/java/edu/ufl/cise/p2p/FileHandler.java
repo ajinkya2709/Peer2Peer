@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.BitSet;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import edu.ufl.cise.p2p.log.Logfile;
 
@@ -23,6 +24,7 @@ public class FileHandler {
 	private String forPeerId;
 	private Set<Integer> neededPieces;
 	Logfile log;
+	private AtomicInteger requestedPieces;
 
 	public FileHandler(int pieceSize, int fileSize, String completeFilePath,
 			String forPeerId) throws IOException {
@@ -33,7 +35,8 @@ public class FileHandler {
 		this.completeFilePath = completeFilePath;
 		this.forPeerId = forPeerId;
 		this.neededPieces = new HashSet<Integer>();
-		this.log=new Logfile(forPeerId);
+		this.log = new Logfile(forPeerId);
+		this.requestedPieces = new AtomicInteger(0);
 	}
 
 	public int getPieceSize() {
@@ -77,7 +80,7 @@ public class FileHandler {
 	}
 
 	public void setAllPieces() {
-		//System.out.println("Size of bitset is:" + bitSet.size());
+		// System.out.println("Size of bitset is:" + bitSet.size());
 		for (int i = 0; i < bitSet.size(); i++)
 			bitSet.set(i);
 	}
@@ -116,7 +119,7 @@ public class FileHandler {
 			}
 			fis.close();
 			totalParts = partNumber;
-			//System.out.println("Total Parts :" + totalParts);
+			// System.out.println("Total Parts :" + totalParts);
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -137,17 +140,19 @@ public class FileHandler {
 			File filePart = null;
 			fos = new FileOutputStream(original, true);
 			// change needed to use totalParts variable
-			//System.out.println("total parts :" + parts);
+			// System.out.println("total parts :" + parts);
 			for (int i = 0; i < parts; i++) {
 				partName = original.getParent() + "/" + partsDirectory + "/"
 						+ "file.part" + String.valueOf(i);
 				filePart = new File(partName);
-				/*System.out.println(filePart.getAbsolutePath() + "  "
-						+ filePart.exists());*/
+				/*
+				 * System.out.println(filePart.getAbsolutePath() + "  " +
+				 * filePart.exists());
+				 */
 				fis = new FileInputStream(filePart);
 				bytes = new byte[(int) filePart.length()];
 				fis.read(bytes, 0, (int) filePart.length());
-				//System.out.println(new String(bytes));
+				// System.out.println(new String(bytes));
 				fos.write(bytes);
 				fos.flush();
 				bytes = null;
@@ -250,6 +255,14 @@ public class FileHandler {
 	public void calculateRequiredPieces() {
 		for (int i = 0; i < bitSetLength; i++)
 			neededPieces.add(i);
+	}
+
+	public AtomicInteger getRequestedPieces() {
+		return requestedPieces;
+	}
+
+	public void setRequestedPieces(AtomicInteger requestedPieces) {
+		this.requestedPieces = requestedPieces;
 	}
 
 	/*
