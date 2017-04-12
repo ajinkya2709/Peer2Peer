@@ -6,6 +6,8 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.concurrent.locks.ReentrantLock;
+
 import edu.ufl.cise.p2p.log.Logfile;
 import edu.ufl.cise.p2p.message.Handshake;
 import edu.ufl.cise.p2p.message.Message;
@@ -23,6 +25,7 @@ public class PeerConnection implements Runnable {
 	Map<String, RemotePeer> remotePeerMap;
 	Peer localPeer;
 	Logfile log;
+	ReentrantLock outStreamLock;
 
 	public PeerConnection(Socket socket, String localPeerId, String remotePeer,
 			boolean isClient, FileHandler fileHandler,
@@ -38,7 +41,9 @@ public class PeerConnection implements Runnable {
 		this.fileHandler = fileHandler;
 		this.remotePeerMap = remotePeerMap;
 		this.localPeer = peer;
-		this.log=new Logfile(localPeerId);	}
+		this.log=new Logfile(localPeerId);
+		outStreamLock = new ReentrantLock();
+	}
 
 	public void run() {
 		System.out.println("Connection created between :" + localPeerId
@@ -93,10 +98,14 @@ public class PeerConnection implements Runnable {
 		if (response == null)
 			return;
 		try {
+			outStreamLock.lock();
 			outStream.writeObject(response);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
+		finally {
+			outStreamLock.unlock();
 		}
 	}
 
