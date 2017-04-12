@@ -139,7 +139,7 @@ public class MessageProcessor {
 				log.logCompletion();
 				fileHandler.getIsComplete().getAndSet(true);
 				if (!checkTermination())
-					return new Terminate();
+					return new Terminate(8);
 			}
 			if (!isChoked)
 				return getRequestMessage(rPeer);
