@@ -128,8 +128,9 @@ public class MessageProcessor {
 			}
 			log.logDownloadingPiece(rPeer.getPeerId(), pieceIndex,
 					totalPiecesDownloaded);
-			if (fileHandler.getNeededPieces().isEmpty()
-					&& fileHandler.getRequestedPieces().get() == 0) {
+
+			if (fileHandler.getBitSet().cardinality() == fileHandler
+					.getBitSetLength()) {
 				fileHandler.mergeFilesInto(fileHandler.getBitSetLength());
 				log.logCompletion();
 				break;
