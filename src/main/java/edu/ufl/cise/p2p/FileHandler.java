@@ -90,6 +90,7 @@ public class FileHandler {
 	}
 
 	public void splitFile(String fileName) {
+		this.getIsComplete().set(true);
 		File file = new File(fileName);
 		File filePartFolder = new File(file.getParent() + "/" + partsDirectory);
 		filePartFolder.mkdirs();

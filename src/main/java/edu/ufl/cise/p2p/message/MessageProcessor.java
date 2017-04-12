@@ -138,8 +138,10 @@ public class MessageProcessor {
 				fileHandler.mergeFilesInto(fileHandler.getBitSetLength());
 				log.logCompletion();
 				fileHandler.getIsComplete().getAndSet(true);
-				if (!checkTermination())
-					return new Terminate(8);
+				for(RemotePeer remotePeer : remotePeers){
+					remotePeer.getConnection().sendMessage(new Terminate(8));
+				}
+				checkTermination();
 			}
 			if (!isChoked)
 				return getRequestMessage(rPeer);
