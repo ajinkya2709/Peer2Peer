@@ -114,6 +114,7 @@ public class MessageProcessor {
 			fileHandler.writePieceData(pieceIndex, piece.getContent());
 			fileHandler.getBitSet().set(pieceIndex);
 			rPeer.getBytesDownloaded().getAndAdd(piece.getContent().length);
+			int totalPiecesDownloaded = fileHandler.getTotalParts() - fileHandler.getNeededPieces().size();
 			for (RemotePeer remote : remotePeers) {
 				if (remote.getConnection() == null)
 					continue;
@@ -122,7 +123,9 @@ public class MessageProcessor {
 							+ remote.getPeerId() + "]");
 					remote.getConnection().sendMessage(new Have(pieceIndex));
 				}
+				totalPiecesDownloaded -= remote.getRequestedPieces().size();
 			}
+			log.logDownloadingPiece(rPeer.getPeerId(), pieceIndex, totalPiecesDownloaded);
 			if (fileHandler.getNeededPieces().isEmpty()) {
 				fileHandler.mergeFilesInto(fileHandler.getBitSetLength());
 				break;

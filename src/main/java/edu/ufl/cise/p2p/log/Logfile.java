@@ -150,7 +150,7 @@ public class Logfile extends Log
 	 * @param index	the index of the piece obtained
 	 * @param has 	the number of pieces this peer has of the file
 	 */
-	public void logDownloadingPiece(int peer, int index, int has)
+	public void logDownloadingPiece(String peer, int index, int has)
 	{
 		String event = peerConnection() + " has downloaded the piece " + index + " from " + peer + ". \nNow the number of pieces it has is " + has + ".\n";
 		this.writeToFile(event);
