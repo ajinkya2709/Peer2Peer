@@ -1,5 +1,6 @@
 package edu.ufl.cise.p2p;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -129,7 +130,7 @@ public class FileHandler {
 		}
 	}
 
-	public void mergeFilesInto(int parts) {
+	public void mergeFilesInto2(int parts) {
 		FileInputStream fis = null;
 		FileOutputStream fos = null;
 		String partName = null;
@@ -159,6 +160,49 @@ public class FileHandler {
 				fis.close();
 				fis = null;
 			}
+			fos.close();
+			fos = null;
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+	
+	public void mergeFilesInto(int parts) {
+		FileInputStream fis = null;
+		FileOutputStream fos = null;
+		String partName = null;
+		byte[] bytes = null;
+		ByteArrayOutputStream bos= new ByteArrayOutputStream();
+		try {
+			File original = new File(completeFilePath);
+			original.createNewFile();
+			File filePart = null;
+			fos = new FileOutputStream(original, true);
+			// change needed to use totalParts variable
+			// System.out.println("total parts :" + parts);
+			for (int i = 0; i < parts; i++) {
+				partName = original.getParent() + "/" + partsDirectory + "/"
+						+ "file.part" + String.valueOf(i);
+				filePart = new File(partName);
+				/*
+				 * System.out.println(filePart.getAbsolutePath() + "  " +
+				 * filePart.exists());
+				 */
+				fis = new FileInputStream(filePart);
+				bytes = new byte[(int) filePart.length()];
+				fis.read(bytes, 0, (int) filePart.length());
+				// System.out.println(new String(bytes));
+				bos.write(bytes, 0, bytes.length);
+				bytes = null;
+				fis.close();
+				fis = null;
+			}
+			fos.write(bos.toByteArray());
 			fos.close();
 			fos = null;
 		} catch (FileNotFoundException e) {
