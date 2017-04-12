@@ -9,6 +9,8 @@ import java.util.BitSet;
 import java.util.HashSet;
 import java.util.Set;
 
+import edu.ufl.cise.p2p.log.Logfile;
+
 public class FileHandler {
 
 	private int pieceSize;
@@ -20,9 +22,10 @@ public class FileHandler {
 	private String partsDirectory = "parts";
 	private String forPeerId;
 	private Set<Integer> neededPieces;
+	Logfile log;
 
 	public FileHandler(int pieceSize, int fileSize, String completeFilePath,
-			String forPeerId) {
+			String forPeerId) throws IOException {
 		this.pieceSize = pieceSize;
 		this.fileSize = fileSize;
 		this.bitSetLength = (int) Math.ceil(1.0 * fileSize / pieceSize);
@@ -30,6 +33,7 @@ public class FileHandler {
 		this.completeFilePath = completeFilePath;
 		this.forPeerId = forPeerId;
 		this.neededPieces = new HashSet<Integer>();
+		this.log=new Logfile(forPeerId);
 	}
 
 	public int getPieceSize() {
