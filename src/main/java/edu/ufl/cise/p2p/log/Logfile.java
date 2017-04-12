@@ -6,6 +6,10 @@ import java.util.ArrayList;
 import edu.ufl.cise.p2p.RemotePeer;
 
 /**
+ * @author Anirudh Rege 
+ **/
+
+/**
  * The Log that will be used by the program to log the following events:
  * TCP Connection
  * Change of Preferred Neighbors
