@@ -21,6 +21,8 @@ public class PeerHandler{
     PreferredNeighbours preferredNeighboursTask;
     OptimisticallyUnchokedNeighbour optimisticallyUnchokedTask;
     CommonPeerProperties commonProp;
+    final ScheduledExecutorService preferredNeighbourSched = Executors.newScheduledThreadPool(1);
+    final ScheduledExecutorService optUnchokedSched = Executors.newScheduledThreadPool(1);
 
     public PeerHandler(ArrayList<RemotePeer> peers, CommonPeerProperties prop, Peer localPeer, int peerId) throws IOException{
 
@@ -34,14 +36,17 @@ public class PeerHandler{
      and optimistically unchoked neighbour*/
 
     public void sendChokeAndUnchokeMessages(){
-        final ScheduledExecutorService preferredNeighbourSched = Executors.newScheduledThreadPool(1);
-        final ScheduledExecutorService optUnchokedSched = Executors.newScheduledThreadPool(1);
 
         preferredNeighbourSched.scheduleAtFixedRate(preferredNeighboursTask,0,
                 commonProp.getUnchokingInterval(), TimeUnit.SECONDS);
 
         optUnchokedSched.scheduleAtFixedRate(optimisticallyUnchokedTask,0,
                 commonProp.getOptimisticUnchokingInterval(), TimeUnit.SECONDS);
+    }
+
+    public void stopChokeAndUnchokeMessages(){
+        optUnchokedSched.shutdown();
+        preferredNeighbourSched.shutdown();
     }
 
     class PreferredNeighbours implements Runnable{
