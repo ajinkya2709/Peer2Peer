@@ -6,6 +6,7 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
 import edu.ufl.cise.p2p.log.Logfile;
@@ -26,11 +27,13 @@ public class PeerConnection implements Runnable {
 	Peer localPeer;
 	Logfile log;
 	ReentrantLock outStreamLock;
+	PeerHandler peerHandler;
+	AtomicBoolean terminate;
 
 	public PeerConnection(Socket socket, String localPeerId, String remotePeer,
 			boolean isClient, FileHandler fileHandler,
-			Map<String, RemotePeer> remotePeerMap, Peer peer)
-			throws IOException {
+			Map<String, RemotePeer> remotePeerMap, Peer peer,
+			PeerHandler peerHandler) throws IOException {
 		this.socket = socket;
 		this.localPeerId = localPeerId;
 		this.remotePeerId = remotePeer;
@@ -41,8 +44,10 @@ public class PeerConnection implements Runnable {
 		this.fileHandler = fileHandler;
 		this.remotePeerMap = remotePeerMap;
 		this.localPeer = peer;
-		this.log=new Logfile(localPeerId);
+		this.log = new Logfile(localPeerId);
 		outStreamLock = new ReentrantLock();
+		this.peerHandler = peerHandler;
+		this.terminate = new AtomicBoolean(false);
 	}
 
 	public void run() {
@@ -61,7 +66,8 @@ public class PeerConnection implements Runnable {
 			}
 			log.logTCPConnection(localPeerId, remotePeerId);
 			MessageProcessor processor = new MessageProcessor(fileHandler,
-					new ArrayList<RemotePeer>(remotePeerMap.values()),localPeer);
+					new ArrayList<RemotePeer>(remotePeerMap.values()),
+					localPeer, peerHandler);
 			Message response = processor.createResponse(handShakeReceived);
 			sendMessage(response);
 
@@ -73,7 +79,7 @@ public class PeerConnection implements Runnable {
 			 * received.length());
 			 */
 
-			while (true) {
+			while (!terminate.get()) {
 				Message message = (Message) inStream.readObject();
 				response = processor.createResponse(message,
 						remotePeerMap.get(remotePeerId));
@@ -102,10 +108,17 @@ public class PeerConnection implements Runnable {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
-		finally {
+		} finally {
 			outStreamLock.unlock();
 		}
+	}
+
+	public AtomicBoolean getTerminate() {
+		return terminate;
+	}
+
+	public void setTerminate(AtomicBoolean terminate) {
+		this.terminate = terminate;
 	}
 
 }

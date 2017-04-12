@@ -8,6 +8,7 @@ import java.util.Random;
 
 import edu.ufl.cise.p2p.FileHandler;
 import edu.ufl.cise.p2p.Peer;
+import edu.ufl.cise.p2p.PeerHandler;
 import edu.ufl.cise.p2p.RemotePeer;
 import edu.ufl.cise.p2p.log.Logfile;
 
@@ -18,14 +19,17 @@ public class MessageProcessor {
 	List<RemotePeer> remotePeers;
 	Peer locaPeer;
 	Logfile log;
+	PeerHandler peerHandler;
 
 	public MessageProcessor(FileHandler fileHandler,
-			List<RemotePeer> remotePeers, Peer localPeer) throws IOException {
+			List<RemotePeer> remotePeers, Peer localPeer,
+			PeerHandler peerHandler) throws IOException {
 		isChoked = true;
 		this.fileHandler = fileHandler;
 		this.remotePeers = remotePeers;
 		this.locaPeer = localPeer;
 		this.log = new Logfile(localPeer.getId());
+		this.peerHandler = peerHandler;
 	}
 
 	public Message createResponse(Handshake handshake) {
@@ -133,10 +137,16 @@ public class MessageProcessor {
 					.getBitSetLength()) {
 				fileHandler.mergeFilesInto(fileHandler.getBitSetLength());
 				log.logCompletion();
-				break;
+				fileHandler.getIsComplete().getAndSet(true);
+				if (!checkTermination())
+					return new Terminate();
 			}
 			if (!isChoked)
 				return getRequestMessage(rPeer);
+
+		case 8:
+			rPeer.getIsTerminated().getAndSet(true);
+			checkTermination();
 		}
 		return null;
 	}
@@ -164,6 +174,23 @@ public class MessageProcessor {
 		fileHandler.getNeededPieces().remove(pieceIndex);
 		rPeer.getRequestedPieces().add(pieceIndex);
 		return new Request(pieceIndex);
+	}
+
+	private boolean checkTermination() {
+		for (RemotePeer remote : remotePeers) {
+			if (!remote.getIsTerminated().get())
+				return false;
+		}
+		if (!fileHandler.getIsComplete().get())
+			return false;
+		// Call something that terminates everything
+		peerHandler.stopChokeAndUnchokeMessages();
+		for (RemotePeer remote : remotePeers) {
+			if (remote.getConnection() != null)
+				remote.getConnection().getTerminate().set(true);
+		}
+		locaPeer.getTerminate().set(true);
+		return true;
 	}
 
 }

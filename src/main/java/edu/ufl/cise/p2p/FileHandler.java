@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.BitSet;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import edu.ufl.cise.p2p.log.Logfile;
@@ -26,6 +27,7 @@ public class FileHandler {
 	private Set<Integer> neededPieces;
 	Logfile log;
 	private AtomicInteger requestedPieces;
+	private AtomicBoolean isComplete;
 
 	public FileHandler(int pieceSize, int fileSize, String completeFilePath,
 			String forPeerId) throws IOException {
@@ -38,6 +40,7 @@ public class FileHandler {
 		this.neededPieces = new HashSet<Integer>();
 		this.log = new Logfile(forPeerId);
 		this.requestedPieces = new AtomicInteger(0);
+		this.isComplete = new AtomicBoolean(false);
 	}
 
 	public int getPieceSize() {
@@ -171,13 +174,13 @@ public class FileHandler {
 		}
 
 	}
-	
+
 	public void mergeFilesInto(int parts) {
 		FileInputStream fis = null;
 		FileOutputStream fos = null;
 		String partName = null;
 		byte[] bytes = null;
-		ByteArrayOutputStream bos= new ByteArrayOutputStream();
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		try {
 			File original = new File(completeFilePath);
 			original.createNewFile();
@@ -307,6 +310,14 @@ public class FileHandler {
 
 	public void setRequestedPieces(AtomicInteger requestedPieces) {
 		this.requestedPieces = requestedPieces;
+	}
+
+	public AtomicBoolean getIsComplete() {
+		return isComplete;
+	}
+
+	public void setIsComplete(AtomicBoolean isComplete) {
+		this.isComplete = isComplete;
 	}
 
 	/*

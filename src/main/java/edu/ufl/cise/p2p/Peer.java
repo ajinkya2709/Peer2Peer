@@ -20,6 +20,7 @@ public class Peer implements Runnable {
 	private PeerHandler peerHandler;
 	private FileHandler fileHandler;
 	private Map<String, RemotePeer> remotePeerMap;
+	private AtomicBoolean terminate;
 
 	public Peer() {
 
@@ -37,11 +38,13 @@ public class Peer implements Runnable {
 	}
 
 	public Peer(String id, String host, int port, Boolean hasFile,
-			List<RemotePeer> remotePeers, CommonPeerProperties commonProps) throws NumberFormatException, IOException {
+			List<RemotePeer> remotePeers, CommonPeerProperties commonProps)
+			throws NumberFormatException, IOException {
 		this.id = id;
 		this.host = host;
 		this.port = port;
-		this.hasFile = hasFile ? new AtomicBoolean(true) : new AtomicBoolean(false);
+		this.hasFile = hasFile ? new AtomicBoolean(true) : new AtomicBoolean(
+				false);
 		this.remotePeerMap = new ConcurrentHashMap<String, RemotePeer>();
 		for (RemotePeer rPeer : remotePeers) {
 			remotePeerMap.put(rPeer.getPeerId(), rPeer);
@@ -51,6 +54,7 @@ public class Peer implements Runnable {
 				remotePeers), commonProps, this, Integer.parseInt(id));
 		this.fileHandler = new FileHandler(commonProps.getPieceSize(),
 				commonProps.getFileSize(), commonProps.getFileName(), id);
+		this.terminate = new AtomicBoolean(false);
 	}
 
 	public CommonPeerProperties getCommonProps() {
@@ -85,7 +89,6 @@ public class Peer implements Runnable {
 		this.port = port;
 	}
 
-
 	public AtomicBoolean getHasFile() {
 		return hasFile;
 	}
@@ -95,13 +98,13 @@ public class Peer implements Runnable {
 	}
 
 	public void run() {
-		boolean shouldRun = true;
+		// boolean shouldRun = true;
 		ServerSocket serverSocket = null;
 		try {
 			serverSocket = new ServerSocket(port);
 			System.out.println("Server started on address:" + host + " port:"
 					+ port);
-			while (shouldRun) {
+			while (!terminate.get()) {
 				createNewConnection(serverSocket.accept(), id, "", false);
 
 			}
@@ -121,7 +124,7 @@ public class Peer implements Runnable {
 		PeerConnection connection = null;
 		try {
 			connection = new PeerConnection(socket, id, remotePeerId, isClient,
-					fileHandler, remotePeerMap, this);
+					fileHandler, remotePeerMap, this, peerHandler);
 			new Thread(connection).start();
 
 		} catch (IOException e) {
@@ -151,6 +154,14 @@ public class Peer implements Runnable {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	public AtomicBoolean getTerminate() {
+		return terminate;
+	}
+
+	public void setTerminate(AtomicBoolean terminate) {
+		this.terminate = terminate;
 	}
 
 }
