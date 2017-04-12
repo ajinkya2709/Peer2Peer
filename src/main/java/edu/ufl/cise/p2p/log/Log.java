@@ -12,15 +12,12 @@ import java.util.Date;
  **/
 public class Log 
 {
-	/******************* Class Attributes *******************/
 	public final String path;
 	private Timestamp time; 
 	private File file;
 	private FileWriter fw;
 	private BufferedWriter bw;
 	
-	/******************* Class Methods 
-	 * @throws IOException *******************/
 	public Log(String path) throws IOException
 	{
 		this.path = path;
